@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+
+
+    /*
+    * The primary method of inserting JS into HTML is via the <script> element.
+    * src - indicate an external file that contains code to be executed.
+    *
+    * its important to note that a <script> element using the src attribute should not include additional
+    * JS code between the <script>.
+    * if no defer or async keyword, the the script will run one by one from top to bottom.
+    *
+    * JS is case-sensitivity.
+    *
+    * identifiers - the first character must be a letter, an underscore or a dollar, it also include the number.
+    * and by convention, js use camel case.
+    *
+    * "use strict" is better in JS6.
+    *
+    * statements - expression with semicolon.
+    *
+    * keywords and reserved words --
+    * break, do, instanceof, typeof, case, else, new, var, catch, finally, return, void, continue, for, switch, while,
+    * debugger, function, this, with, default, if, throw, delete, in, try, let, interface ;
+    *
+    * abstract, enum, int, short, boolean, export, interface, static, byte, extends, long, super, char, final, native,
+    * synchronized, class, float, package, throws, const, goto, private, transient, debugger, implements, protected, volatile,
+    * double, import, public.
+    *
+    * variable - can be any type of data, which is simply a named placeholder for a value.
+    *
+    * its important to note that using the var operator to define a variable makes it local to the scope in which it
+    * was defined, for example, defining a variable inside of function using var means that the variable is destroyed
+    * as soon as the function exists.
+    * */
+
+//    function test() {
+//        var message = "hi"; // local variable
+//    }
+//    test();
+//    console.log(message); // error
+
+    // but notice that we can remove the "var" to change the local variable to global variable, but we DO NOT recommend it!
+
+    // define multiple variables by comma.
+    //    var message = "hi", found = false, age = 29;
+
+
+    /*
+    * data type: -- undefined, null, boolean, string, number (primitive types). and object (complex data type)
+    *
+    * we use typeof operator to define the type for primitive type
+    *
+    * typeof can define undefined, boolean, string, number, object, function
+    * also has some special case.
+    * */
+//    console.log(typeof null); // object
+
+    /*
+    * the undefined type has only one value, which is the special value undefined. when a variable is declared using var
+    * but not initialized, it is assigned the value of undefined as follow
+    * */
+//    var message;
+//    console.log(typeof message); // undefined
+//    console.log(message === undefined); // true
+
+    // also can assign undefined to message
+//    message = undefined;
+//    console.log(typeof message); // undefined
+
+    // note that if a variable is not defined , it will cause an error.
+
+    /*
+    * typeof operator returns "undefined" when called on an uninitialized variable, but it also returns "undefiend",
+    * when called on an undeclared variable.
+    * */
+//    var message;
+//    console.log(typeof message);
+//    console.log(typeof age); // age is not declared, but return undefined
+
+    /*
+    * Null type is the second type that has only one value: the special value null. a null value is an empty object pointer.
+    *
+    * when defining a variable that i meant to later hold an object, it is advisable to initialize the value to null
+    * as opposed to anything else.. we can explicitly check for the value null to determine if the variable has been
+    * filled with an object reference at a later time.
+    * */
+//    var car = null;
+//    console.log(typeof car); // object
+//
+//    if (car != null) {
+//        // do something with car.
+//    }
+
+    // we can believe that null === undefined
+//    console.log(null == undefined); // true
+//    console.log(null === undefined); // false
+
+    /*
+    *  boolean type -- true and false
+    *  by Boolean() casting function to transfer other primitive type to boolean type
+    *
+    *  the rule will follow --
+    *  Boolean       true                              false
+    *  String     any nonempty string                   ""
+    *  Number     any nonzero number                   0, NaN
+    *  Object     any object                            null
+    *  Unndefined     n/a                              undefined
+    *
+    *  especial in if statement the upon transfer will auto run.
+    * */
+//    var message = "hello world";
+//    console.log(Boolean(message)); // true
+
+
+    /*
+    * Number type include integer, float-point value
+    *
+    * floating-point value are accurate up to 17 decimal place but are far accurate in arithmetic computation than
+    * whole numbers.
+    *
+    * so we should never test for specific floating-point value.
+    * */
+//    var a = 0.1, b = 0.2;
+//    if (a + b == 0.3) { // avoid, beacuse got 0.3000000000000004
+//        console.log('you got 0.3'); //
+//    }
+
+    /*
+    * range of value --
+    * because of memory constraints, the smallest and largest number that in JS is stored in Number.MIN_VALUE and
+    * Number.MAX_VALUE, if out that range, it will be -Infinity() and Infinity().
+    * to determine if a value is finite, there is the isFinite() function.
+    * */
+
+    var result = Number.Max_VALUE + Number.MAX_VALUE;
+    console.log(isFinite(result)); // false
+
+    /*
+    * NaN -- not a value, for example, dividing any number by 0 return NaN, which allow other processing to continue.
+    * any operation involving NaN always returns NaN, and NaN is not equal to any value, including NaN.
+    *
+    * isNaN() function can return boolean to determine the content of data type
+    *
+    * isNaN() also can applied to objects, in tht case, the object's valueOf() method is first called to determine if
+    * the returned value can be converted into a number, if not, the toString() method is called and its returned value
+    * is tested as well.
+    *
+    * */
+    console.log(NaN == NaN); // false
+
+    console.log(isNaN(NaN)); // true
+    console.log(isNaN(10)); // false
+    console.log(isNaN("10")); // false, can be converted to number 10
+    console.log(isNaN("blue")); // true, cannot be converted to a number
+    console.log(isNaN(true)); // false, can be converted to number 1
+
+    /*
+    * number conversion --
+    * three functions to convert nonnumeric values into numbers: Number(), parseInt(), parseFloat().
+    *
+    * Number() function can used on any data type. and the other two only work on string type
+    *
+    * Number() --
+    *
+    * applied to Boolean value, true and false get converted into 1 and 0
+    * applied to numbers, the value is simply passed through and returned
+    * applied to null, return 0
+    * applied to undefined, returns NaN
+    *
+    * if string only contains number, it will return number,
+    * string is empty, it return 0
+    * if string contain more number, returns NaN.
+    *
+    * applied to object, the valueOf() is called and the returned value is converted based on the previously described
+    * rules. if that conversion results in NaN, the toString() method is called and the rules for converting strings
+    * are applied.
+    *
+    * */
+    console.log(Number("123 hello")); // NaN
+    console.log(Number("hello world")); // NaN
+    console.log(Number("")); // 0
+    console.log(Number("00011")); // 11
+    console.log(Number(true)); // 1
+
+    /*
+    * parseInt() is a better option when dealing with string, if the first character is not a number, the minus or plus
+    * sign, it will return NaN, even the empty string, it will return NaN.
+    *
+    * */
+    console.log(parseInt("1234blue")); // 1234
+    console.log(parseInt("+ok")); // NaN
+    console.log(parseInt("")); // NaN
+    console.log(parseInt(22.6)); // 22
+    console.log(parseInt("0xf")); // 15
+    console.log(parseInt("af", 16)); //175
+
+
+    /*
+    * string type ---
+    *  can use double quote or single quote
+    *
+    *  string are immutable in JS, which means that once they are created, their values cannot change, to change the string
+    *  held b y a variable, the original string must be destroyed and the variable filled with another string containing
+    *  a new value.
+    *
+    *  converting to a string
+    *  toString() is to return the string equivalent of the value.
+    *  toString() method is available on value that are numbers, booleans, object and string. if a value is null or
+    *  undefined, this method is not available.
+    *  it also contains the argument for number data type
+    *
+    *
+    *  String() method ---
+    *  if the value has a toString() method, it is called and the result is returned
+    *  if the value is null, return "null"
+    *  if the value is undefined, returned "undefined"
+    *
+    * */
+    var text = "this is the letter sigma: \u03a3.";
+    console.log(text.length);
+    console.log("\u03a3"); // ∑
+
+    var lang = "Java";
+    lang = lang + "Script";
+    console.log(lang); // JavaScript
+
+    var age = 11;
+    console.log(age.toString()); // "11"
+    var found = true;
+    console.log(found.toString()); // "true"
+
+    var num = 10;
+    console.log(num.toString(2)); // "1010"
+    console.log(num.toString(8)); // "12"
+    console.log(num.toString(16)); // "a"
+
+    var val1 = 10;
+    console.log(String(val1)); // "10"
+    console.log(String(null)); // "null"
+    console.log(String(undefined)); // "undefined"
+
+    // we also can convert a value by adding a empty string ""
+    console.log("" + 12); // "12"
+    console.log("12" + 12); // "1212"
+    console.log(12 + "12"); // "1212"
+
+
+
+    /*
+    * the Object type --
+    * objects are created by using the new operator followed by the name of the object type to create.
+    * developers create their own objects by creating instances of the Object type and adding properties
+    *
+    * the Object type in JS is the base from which all other objects are derived. all of the properties and methods of the Object
+    * type are also present on other.
+    *
+    * constructor -- the function that was used to create the object. the constructor is the Object() function.
+    *
+    * hasOwnProperty -- indicates if the given property exists on the object instance. the property name must be specified as a string
+    * o.hasOwnProperty("name")
+    *
+    * isPrototypeOf(object) -- determine if the object is a prototype of the another object
+    *
+    * toLocaleString() -- returns a string representation of the object that is appropriate for the locale of execution environment.
+    *
+    * toString() -- returns a string representation of the object
+    *
+    * valueOf() -- returns a string, number, or Boolean equivalent of the object. it usually returns the same value as toString().
+    * */
+//    var o = new Object();
+
+    /*
+    *  operators -- a set of operators that can be used to manipulate data values.
+    *
+    *  operators that work on only one value are called unary operators.
+    *  unary operators can work on any values, meaning not just integers but strings, Booleans, floating-point values, and objects
+    *  --
+    *  when used on a string that is a valid representation of a number, convert to a number and apply the change. the variable is
+    *  changed from a string to a number.
+    *  when used on a string that is not a valid number, the variable's value is set to NaN.
+    *  when used on a Boolean value that is false, convert to 0 , and true convert to 1 as well.
+    *  when used on a object, call its valueOf() method to get a value to work with. if the result is NaN, then call toString() and
+    *  apply the other rules again.
+    *
+    * */
+
+    var age = 29;
+    ++age; // 30
+
+    age = 29;
+    --age; // 28
+
+    var age = 29;
+    var anotherAge = --age + 2;
+    console.log(age); // 28
+    console.log(anotherAge); // 30
+
+    var age = 29;
+    var anotherAge = age-- + 2;
+    console.log(anotherAge); // 31
+    console.log(age); // 28
+
+    // its important to differentiate the age-- (postfix) and --age (prefix)
+
+    var s1 = "2";
+    var s2 = "z";
+    var b = false;
+    var f = 1.1;
+    var o = {
+        valueOf: function () {
+            return -1;
+        }
+    };
+
+    s1++; // 3
+    s2++; // NaN
+    b++; // 1
+    f--; // 0.1000000009
+    o--; // -2
+
+    /*
+    * unary plus and minus --
+    * just like the + and - sign
+    * */
+
+    /*
+    * bitwise operators
+    * bitwise not, bitwise and, bitwise or, bitwise xor, left shift, right shift
+    * do some operation on bits
+    * */
+
+    /*
+    * boolean operators --
+    * logical not,
+    * for object, false is returned
+    * for empty string, true is returned
+    * for nonempty string, false is returned
+    * for number 0, true is returned
+    * for any other than 0 number, false is returned
+    * for null, true is returned
+    * for undefined, true is returned
+    * for NaN, true is returned
+    *
+    *
+    * by using two NOT operators in a row, we can effectively simulate the behavior of the Boolean() casting function
+    * console.log(!!1234) === true
+    * */
+
+
+    /*
+    * logical AND --
+    * logical and can be used with any type of operand, not just Boolean type values, when either operand is not a primitive Boolean,
+    * logical AND does not always return a Boolean value. instead, it does one of the following rules
+    * if the first operand is an object, then the second operand is always returned.
+    * if the second operand is an object, then the object is returned only if the first operand evaluates to true
+    * if both operand are objects, then the second operand is returned.
+    * if either operand is null, then null is returned,
+    * if either operand is NaN, then NaN is returned,
+    * if either operand is undefined, then undefined is returned.
+    *
+    * so, the logical AND operate is a short-circuited operation, meaning that if the first operand determines the result,
+    * the second operand is never evaluated. if the first operand is false, no matter what the value of the second operand, the result
+    * cannot be equal to true.
+    * */
+
+//    var found = true;
+//    var result = (found && someUndeclaredVariable); // error occurs here
+//    console.log(result); // this line never executes
+
+//    var found = false;
+//    var result = (found && someUndeclaredVariable); // no error, because return false
+//    console.log(result); // false, because the short-circuited operation
+
+
+    /*
+    * logical OR --
+    * like logical AND,
+    * if the first operand is an object, then the first operand is returned
+    * if the first operand evaluates to false, then the second operand is returned
+    * if both operand are objects, the the first object is returned
+    * if both operand are null, the null is returned
+    * if both operand are NaN, then NaN is returned
+    * if both operands are undefined, then undefined is returned
+    *
+    * */
+
+//    var myObject = preferredObject || backupObject;
+
+    /*
+    * the variable myObject will be assigned one of the two values, the preferredObject variable contains the value that is
+    * preferred if its available, whereas the backupObject variable contains the backup value if the preferred one isnot available.
+    * if preferredObject isnot nul, then its assigned to myObject, if it is null, then backupObject is assigned to myObject.
+    * */
+
+    /**
+      multiplicative operators ---
+     multiple, divide, modules.
+     *
+     */
+
+    /*
+    * difference between add and substract is about the string add number
+    * */
+
+    console.log(5 + "5"); // 55
+    var num1 = 5;
+    var num2 = 10;
+    var message = "the sum of 5 and 10 is " + (num1 + num2);
+    var message1 = "the sum of 5 and 10 is " + num1 + num2;
+    console.log(message); // 15
+    console.log(message1); // 510
+
+    /*
+    * for substract --
+    * if either operand is an object, its valueOf() is called to retrieve a numeric value to represent it. if that value is NaN, then
+    * the result of the subtraction is NaN. if the object does not have valueOf() defined, then toString() is called and the resulting string
+    * is converted into a number.
+    * */
+
+    var res1 = 5 - true; // 4
+    var res2 = NaN - 1; // NaN
+    var res3 = 5 - 3; // 2
+    var res4 = 5 - ""; // 5
+    var res5 = 5 - "2"; // 3
+    var res6 = 5 - null; //5
+
+    /*
+    * relational operators --
+    * if the operand are numbers, perform a numeric comparison
+    * if the operands are string, compare the character codes of each corresponding character in the string
+    * if one operand is a number, convert the other operand to a number and perform a numeric comparison
+    * if one operand is an object, call valueOf() and use its result to perform the comparison according to the previous rules.
+    * if valueOf() is not available, call toString() and use that value according to the previous rules.
+    * if an operand is a Boolean, convert it to a number and perform the comparison.
+    *
+    * the result of any relational operation with NaN is false
+    * */
+
+    var result = "23" < "3"; // true
+    var result = "23" < 3; // false
+
+    var result = NaN >= 7; // false
+
+
+    /*
+    *  null == undefined   true
+    *  "NaN" == NaN        false
+    *  5 == NaN            false
+    *  NaN == NaN          false
+    *  NaN != NaN          true
+    *  false == 0          true
+    *  true == 1           true
+    *  true == 2           true
+    *  undefined == 0      false
+    *  null == 0           false
+    *  "5" == 5            true
+    * */
+
+
+    /*
+    * conditional operator
+    *
+    * variable = boolean_expression ? true_value : false_value;
+    * */
+
+    var max = (num1 > num2) ? num1 : num2;
+
+    /*
+    * statements --
+    * if statement,  do-while statement, while statement, for statement, for-in statement
+    *
+    * there are no block-level variables in JS, so a variable defined inside the loop is accessible outside the loop as well.
+    * */
+
+    var count = 10;
+    for (var i = 0; i < count; i++) {
+        console.log(i);
+    }
+    console.log(i); // 10
+
+
+    /*
+    * break and continue statement
+    * */
+
+    var num = 0;
+    outermost:
+    for (var i = 0; i < 10; i++) {
+        for (var j = 0; i < 10; j++) {
+            if (i == 5 && j == 5) {
+                break outermost;
+            }
+            num++;
+        }
+    }
+    console.log(num); //55
+
+    var num = 0;
+
+    outermost1:
+    for (var i = 0; i < 10; i++) {
+        for (var j = 0; j < 10; j++) {
+            if (i == 5 && j == 5) {
+                continue outermost1;
+            }
+            num++;
+        }
+    }
+    console.log(num); // 95
+
+
+    /*
+    * switch statement
+    *
+    * */
+
+    /*
+    * functions --
+    * functions are the core in JS, they allow the encapsulation of statements that can be run anywhere and at any time.
+    *
+    * any code that comes after a return statement will never be executed.
+    * */
+
+    function sum(num1, num2) {
+        return num1 + num2;
+        console.log("hello world"); // never executed
+    }
+
+    // return statement can also be used without specifying a return value. when used in this way, the function stops executing immediately
+    // and returns undefined as its value.
+
+    // arguments.length
+    function doAdd() {
+        if (arguments.length == 1) {
+            console.log(arguments[0] + 10);
+        } else if (arguments.length == 2) {
+            console.log(arguments[0] + arguments[1]);
+        }
+    }
+    doAdd(10);  // 20
+    doAdd(30,20); // 50
+
+    /*
+    * last to remember:
+    * no overloading --
+    * JS function has the arguments which are represented as an array containing zero or more values
+    * so, if two functions are defined to have the same name in JS, it is the last function that becomes the owner of that name.
+    * */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
