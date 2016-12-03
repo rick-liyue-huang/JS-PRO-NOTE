@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    /*
+    * a variable is literally just a name for a particular value at a particular time, and a variable's value and data type can change
+    * during the lifetime of a script. it contains two types of data: primitive value and reference value. Primitive values are simple
+    * atomic pieces of data, while reference values are object that may be made of multiple values.
+    *
+    * five primitive values: null, undefined, string, boolean, number. these values are accessible by value, because you are manipulated
+    * the actual value stored in the variable.
+    * reference values are objects stored in memory, JS does not permit direct access of memory locations. so direct manipulation of the
+    * object's memory space is not allowed. when we manipulate an object, you're really working on a reference to that object rather than
+    * the actual object itself. so we can say they are accessed by reference.
+    *
+    * one big difference is that --
+    * we can add, change or delete properties and methods on one reference value at any time.
+    * only reference values can have properties defined dynamically for later use.
+    * */
+
+    var person = new Object();
+    person.name = "rick";
+    console.log(person.name);
+
+    /*
+    * each primitive values can now be used separately without no side effect.
+    * actually, primitive values and reference values both copy the content ("value") to the other. for primitive values, the "value"
+    * is the actual value, while for reference values, the "value" is the location "reference". so they both refer to the same object.
+    * */
+
+    var num1 = 5;
+    var num2 = num1;
+    var num1 = 10;
+    console.log(num2); // 5, after copying value, they are separately.
+
+    var obj1 = new Object();
+    var obj2 = obj1;
+    obj1.name = "leo";
+    console.log(obj2.name); // leo, they both have the same address, reference to the object. one changed reflect on the other one.
+    // when the property name is set on obj1, it can later be accessed from obj2 because they both point to the same object.
+
+    /*
+    * arguments passing --
+    * all function arguments in JS are passed by value. this means that the value outside of the function is copied into an argument
+    * on the inside of the function the same way a value is copied from one variable to another. arguments are passed only by value.
+    * when an argument is passed by reference, the location of the value in memory is stored into a local variable, which means that changes
+    * to the local variable are reflected outside of the function.
+    * */
+
+    function addTen(num) {
+        num += 10;
+        return num;
+    }
+    var count = 20;
+    var result = addTen(count);
+    console.log(count); // 20
+    console.log(result); //30
+
+    /*
+    * upon code --
+    * the function addTen() has an argument num, which is essentially a local variable. when called, the variable count is passed in
+    * as an argument. This variable has a value of 20, which is copied into the argument num for use inside of addTen(). within the
+    * function, the argument num has its value changed by adding 10, but this does not change the original variable count that exists outside
+    * of the function.--- the argument num and variable count do not recognize each other.
+    * */
+
+    function setName(obj) {
+        obj.name = "rick";
+    }
+    var person = new Object();
+    setName(person);
+    console.log(person.name); // rick
+
+    /*
+    * upon code --
+    * an object is created and stored in the variable person. this object is then passed into the setName() method, where it is
+    * copied into obj. inside the function, obj and person both point to the same object. obj is accessing an object by reference, even though
+    * it was passed into the function by value. when the name property is set on obj inside the functioin, this change is reflected outside the
+    * function, because the object that it points to exists globally on the heap.
+    * */
+
+    // also consider the following code
+    function setName1(obj) {
+        obj.name = "rick";
+        obj = new Object();
+        obj.name = "leo";
+    }
+    var person = new Object();
+    setName1(person);
+    console.log(person.name); // rick
+
+    /*
+    * the variable obj is set to be a new object and its name property is set to LEO. when obj is overwritten inside the function,
+    * it becomes a pointer to a local object. that local object is destroyed as soon as the function finishes executing.
+    *
+    * so, think of function arguments in JS as nothing more than local variable.
+    * */
+
+    /*
+    * determining type --
+    * typeof operator,
+    *
+    * instanceof
+    * result = variable instanceof constructor
+    * instanceof operator returns true if the variable is an instance of the given reference type
+    * */
+
+//    console.log(person instanceof Object); // true
+//    console.log(colors instanceof Array);
+//    console.log(pattern instanceof RegExp);
+
+
+    /*
+    * execution context -- context, is of the utmost importance in JS.
+    * each execution context has an associated variable object upon which all of its defined variables and functions exist.
+    * this object is not accessible by code but is used behind the scenes to handle data.
+    *
+    * all global variables and functions are created as properties and methods on the window object.
+    * when an execution context has executed all of its code, it is destroyed, taking with it all of the variables and functions
+    * defined within it. the global context is not destroyed until the application exits, such as when a web page is closed or
+    * a web browser is shut down.
+    *
+    * each function call has its own execution context. whenever code execution flows into a function, the function's context is pushed
+    * onto a context stack. after the function has finished executing, the stack is popped, return control to the previously executing context.
+    * the facility controls execution flow throughout an JS program.
+    *
+    * when code is executed in a context, a scope chain of variable objects created. the front of the scope chain is always the variable
+    * object of the context whose code is executing.
+    *
+    * if the context is a function, then the activation object is used as the variable object. an activation object starts with a single defined
+    * variable called arguments. the next variable object in the chain is from the containing context, and the next after that is from the
+    * next containing context. this pattern continues until the global context is reached. the global context's variable object is always
+    * the last of the scope chain.
+    * */
+
+//    var color = "blue";
+//    function changeColor() {
+//        if (color === "blue") {
+//            color = "red";
+//        } else {
+//            color = "blue";
+//        }
+//    }
+//    changeColor();
+
+    // function changeColor() has a scope chain with two objects in it: its own variable object (upon which the arguments object is defined)
+    // and the global context's variable object.
+
+
+    var color = "blue";
+    function changeColor() {
+        var anotherColor = "red";
+
+        function swapColors() {
+            var tempColor = anotherColor;
+            anotherColor = color;
+            color = tempColor;
+
+            // color, anotherColor, and tempColor are all accessible here.
+        }
+
+        // color and anotherColor are accessible here, but not tempColor
+
+        swapColors();
+    }
+    // only color is accessible here.
+    changeColor();
+
+    // an inner context can access everything from all outer contexts through the scope chain, but the outer contexts cannot
+    // access anything within an inner context.
+
+    /*
+    * Even though there are only two primary types of execution context,
+    * catch block in a try-catch statement
+    * a with statement
+    * */
+
+    /*
+    * No block-level scope --
+    * JS's lack of block-level scope.
+    * */
+
+    if (true) {
+        var color = "blue";
+    }
+    console.log(color); // blue
+
+    // this is important to keep in mind when dealing with the for statement
+    for (var i = 0; i < 10; i++) {
+//        dosomething
+    }
+    console.log(i); // 10
+
+
+    /*
+    * variable definition --
+    * using var produce the local variable; without using var produces the global variable.
+    *
+    * identifier is referenced for either reading or writing within a particular context, a search must take place to determine what
+    * identifier it represents. the lookup continues along the scope chain. this process continues until the search reaches the global
+    * context's variable object.
+    * */
+
+    var color = "blue";
+    function getColor() {
+        var color = "red";
+        return color;
+    }
+    console.log(getColor()); // red, the local variable block the outer variable.
+
+    /*
+    * garbage collection --
+    * the basic ideat it simple: figure out which variables are not going to be used and free the memory associated with them. this process
+    * is periodic, with the garbage collector running at specified intervals
+    *
+    * mark-and-sweep garbage collection for JS --
+    * mark as into the context or out of context. and sweep the memory
+    *
+    * reference counting --
+    * count the reference, if get zero will delete. problem : circular reference. to set a variable to null to avoid the circular reference.
+    * */
+
+    /*
+    *  when data is no longer necessary, its best to set the value to null, freeing up the reference -- this is called dereferencing the value.
+    * */
+
+    function createPerson(name) {
+        var localPerson = new Object();
+        localPerson.name = name;
+        return localPerson;
+    }
+    var globalPerson = createPerson("leo");
+    // do something with globalPerson
+    globalPerson = null;
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
