@@ -297,9 +297,524 @@
     * __proto__, [[Prototype]]
     * */
 
-    
+//    console.log(Person.prototype.isPrototypeOf(p1)); // true
+
+//    console.log(Object.getPrototypeOf(p1)) == Person.prototype(); // true
+
+    console.log(p1.hasOwnProperty("name")); //false, because "name" is belong to the prototype of Person.
+
+    /*
+    * prototypes and the in operator
+    *
+    * there are two ways to use the in operator: on its own or as a for-in loop
+    * */
+
+    function Person1() {
+    }
+
+    Person1.prototype.name = "rick";
+    Person1.prototype.age = 29;
+    Person1.prototype.job = "nurse";
+    Person1.prototype.sayName = function () {
+        console.log(this.name);
+    };
+
+    var p1 = new Person1();
+    var p2 = new Person1();
+
+    console.log(p1.hasOwnProperty("name")); // false
+    console.log("name" in p1); // true
+
+    p2.name = "leo";
+    console.log(p2.hasOwnProperty("name")); // true
+    console.log("name" in p2); // true
+
+    /*
+    * throughout the execution of this code, the property name is available on each object object either directly or from the prototype.
+    * therefore, "name" in p1 always return true.
+    * */
+
+    // so we can build a function to determine the property belong to prototype
+    function hasPrototypeProperty(obj, name) {
+        return !obj.hasOwnProperty(name) && (name in obj);
+    }
+
+    /*
+    * alternate Prototype syntax
+    *
+    * to better visually encapsulate functionality on the prototype, it has become more common to simply overwrite the prototype with an object literal that contains all
+    * of the properties and methods
+    * */
+
+    function Person2() {
+    }
+    Person2.prototype = {
+        name: "claire",
+        age: 7,
+        job: "student",
+        sayName: function () {
+            console.log(this.name);
+        }
+    };
+
+    /*
+    * here the Person2.prototype is set equal to a new object created with an object literal.
+    * but, consturctor property no longer points to Person2
+    * */
+
+    console.log(Person2.prototype.constructor === Person2); // false
+
+    // in order to solve the problem, add the constructor property
+    function Person3() {
+    }
+
+    Person3.prototype = {
+        constructor: Person3,
+        name: "leo",
+        age: 29,
+        job: "doctor",
+        sayName: function () {
+            console.log(this.name);
+        }
+    };
+
+    // or, keep in mind that restoring the constructor in this manner creates a property with [[Enumerable]] set to true
+    function Person4() {
+    }
+    Person4.prototype = {
+        name: "rick",
+        age: 45,
+        job: "nurse",
+        sayName: function () {
+            console.log(this.name);
+        }
+    };
+
+    Object.defineProperty(Person4.prototype, "constructor", {
+        enumerable: false,
+        value: Person4
+    });
+
+    console.log(Person4.prototype.constructor === Person4); // true
 
 
+    /*
+    * Dynamic Nature of prototypes ---
+    * since teh process of looking up values on a prototype is a search, changes made to the prototype at any point are immediately reflected on instances
+    * */
+
+    var friend = new Person4();
+    Person4.prototype.sayHi = function () {
+        console.log("hi");
+    };
+
+    friend.sayHi(); // hi
+    // it works, because of the loose link between the instance and the prototype.
+
+    // remember that: the instance has a pointer to only the prototype, not to the constructor.
+    function Person5() {
+    }
+    var friend = new Person5();
+    Person5.prototype = {
+        constructor: Person5,
+        name: "rick",
+        age: 20,
+        job: "nurse",
+        sayName: function () {
+            console.log(this.name);
+        }
+    };
+//    friend.sayName(); // cause error
+
+    // a new instance of Person is created before the prototype object is overwritten. because the prototype that friend ponts to does not contain a property of that name.
+
+    /*
+    * native Object prototype --
+    * sort() method can be found on Array.prototype and substring() can be found on String.prototype
+    *
+    * and also can add the new methods at any time.
+    * */
+
+    console.log(typeof Array.prototype.sort()); // function
+    console.log(typeof String.prototype.substring()); // function
+
+    String.prototype.startsWith = function (text) {
+        return this.indexOf(text) == 0;
+    };
+
+    var msg = "hello world";
+    console.log(msg.startsWith("hello")); // true, but not recommended for native prototype
+
+    /*
+    * problems with prototype --
+    * it comes with their shared nature.
+    * the real problem occurs when a property contains a reference value.
+    * */
+    function Person6() {
+    }
+
+    Person6.prototype = {
+        constructor: Person6,
+        name: "rick",
+        age: 40,
+        job: "nurse",
+        friends: ['leo', 'claire'],
+        sayName: function () {
+            console.log(this.name);
+        }
+    };
+
+    var p3 = new Person6();
+    var p4 = new Person6();
+
+    p3.friends.push('kaka');
+    console.log(p3.friends); // ["leo", "claire", "kaka"]
+    console.log(p4.friends); // ["leo", "claire", "kaka"]
+    console.log(p4.friends === p3.friends); // true
+
+
+    /*
+    * Combination constructor / Prototype Pattern
+    * The most common way of defining custom types is to combine the constructor and prototype patterns. the constructor pattern defines instance properties, and the prototype
+    * pattern defines method and share properties.
+    *
+    * with this approach, each instance ends up with its own copy of the instance properties, but they all share references to methods, conserving memory.
+    * */
+
+    function Person7(name, age, job) {
+        this.name = name;
+        this.age = age;
+        this.job = job;
+        this.friends = ["claire", "rick"];
+    }
+
+    Person7.prototype = {
+        constructor: Person7,
+        sayName: function () {
+            console.log(this.name);
+        }
+    };
+
+    var p5 = new Person7("leo", 30, "nurse");
+    var p6 = new Person7('feifei', 20, 'doctor');
+
+    p5.friends.push('van');
+    console.log(p5.friends);  // ["claire", "rick", "van"]
+    console.log(p6.friends);  // ["claire", "rick"]
+
+    console.log(p5.friends == p6.friends); // false
+    console.log(p5.sayName == p6.sayName); // true
+
+    // the hybrid constructor/prototype pattern is the most widely used and accepted practice for defining custom reference types, generally speaking, this is the default pattern
+    // to use for defining reference types.
+
+
+    /*
+    * Dynamic Prototype pattern --
+    * to encapsulate all of the information within the constructor while maintaining the benefits of using both a constructor and a prototype by initializing the protoype
+    * inside the constructor.
+    *
+    * notice: --
+    * we cannot overwrite the prototype using an object literal when using the dynamic prototype pattern. as described previously, overwriting a prototype when
+    * an instance already exists effectively cuts off that instance from the new prototype.
+    * */
+
+    function Person8(name, age, job) {
+        // properties
+        this.name = name;
+        this.age = age;
+        this.job = job;
+
+        // methods
+        if (typeof this.sayName != "function") {
+            Person8.prototype.sayName = function () {
+                console.log(this.name);
+            };
+        }
+    }
+
+    var friend = new Person8('rick', 28, 'software engineer');
+    friend.sayName();  // rick
+
+
+    /*
+    * Parasitic constructor pattern --
+    * parasitic constructor pattern is typically a fallback when the other patterns fails.
+    *
+    * the parasitic constructor pattern is same as the factory pattern, except for using new operator to create the instance
+    * */
+    function Person9(name, age, job) {
+        var o = new Object();
+        o.name = name;
+        o.age = age;
+        o.job = job;
+        o.sayName = function () {
+            console.log(this.name);
+        };
+        return o;
+    }
+    var friend1 = new Person9('rick', 22, 'nurse');
+    friend1.sayName(); // rick
+
+    /*
+    * this pattern allows you to create constructors for objects that may not be possible otherwise. we can create a special array that has an
+    * extra method
+    * */
+
+    function SpecialArray() {
+
+        // create the array
+        var values = new Array();
+
+        // add the values
+        values.push.apply(values, arguments);
+
+        // assign the method
+        values.toPipedString = function () {
+            return this.join("|");
+        };
+
+        // return it
+        return values;
+    }
+    var colors = new SpecialArray('red', 'blue', 'green');
+    console.log(colors.toPipedString()); // red|blue|green
+
+    /*
+    * in this example, a constructor called SpecialArray is created.
+    * there is no relationship between the returned object and the constructor or the constructor's prototype
+    * */
+
+    /*
+    * durable Constructor pattern --
+    * refer to objects that have no public properties and whose methods do not reference the this object.
+    * durable constructor pattern are best used in secure environments or to protect data from the rest of the application.
+    * a durable constructor is a constructor that follows a pattern similar to the parasitic constructor pattern, with two differences: instance methods
+    * on the created object donot refer to this, and the constructor is never called using the new operator
+    * */
+
+    function durablePerson(name, age, job) {
+        // create the object to return
+        var o = new Object();
+
+        // optional: define private variables/functions here
+
+        // attach methods
+        o.sayName = function () {
+            console.log(name);
+        };
+
+        // return the object
+        return o;
+    }
+
+    // note that there is no way to access the value of name from the returned object. the sayName() method has access to it, but nothing else does.
+    var friend2 = durablePerson("leo", 20, 'nurse');
+    friend2.sayName(); // leo
+
+
+    /*
+    * Prototype chaining --
+    * the basic idea is to use the concept of prototypes to inherit properties and methods between two reference types.
+    * each constructor has a prototype object that points back to the constructor, and instances have an internal pointer to the prototype.
+    * that would mean the prototype itself would have a pointer to a different prototype that, in turn, would have a pointer to another constructor. if that prototype were also an
+    * instance of another type, then the pattern would continue, forming a chain between instances and prototypes.
+    * */
+
+    function SuperType() {
+        this.property = true;
+    }
+    SuperType.prototype.getSuperValue = function () {
+        return this.property;
+    };
+
+    function SubType() {
+        this.subProperty = false;
+    }
+
+    // inherit from SuperType
+    SubType.prototype = new SuperType();
+
+    SubType.prototype.getSubValue = function () {
+        return this.subProperty;
+    };
+
+    var instance = new SubType();
+    console.log(instance.getSuperValue()); // true
+
+    // the instance -> SubType.prototype -> SuperType.prototype -> Object.prototype
+
+    // prototype and instance relationship
+    console.log(instance instanceof Object); // true
+    console.log(instance instanceof SubType); // true
+    console.log(instance instanceof SuperType); // true
+
+    // by isPrototypeOf()
+    console.log(Object.prototype.isPrototypeOf(instance)); // true
+    console.log(SuperType.prototype.isPrototypeOf(instance)); // true
+    console.log(SubType.prototype.isPrototypeOf(instance)); // true
+
+
+    // another important thing to understand is that the object literal approach to creating prototype method
+
+    function SuperType1() {
+        this.property = true;
+    }
+
+    SuperType1.prototype.getSuperValue = function(){
+        return this.property;
+    };
+
+    function SubType1(){
+        this.subproperty = false;
+    }
+
+    //inherit from SuperType
+    SubType1.prototype = new SuperType();
+
+    //try to add new methods - this nullifies the previous line
+
+    SubType1.prototype = {
+
+        getSubValue : function (){
+            return this.subproperty;
+        },
+        someOtherMethod : function (){
+            return false;
+        }
+    };
+
+    var instance = new SubType1();
+//    console.log(instance.getSuperValue()); // error
+
+    /*
+    * the prototype is reassigned to be an object literal after it was already assigned to be an instance of SuperType.
+    * the prototype now contains a new instance of Object instead of an instance of SuperType, so the prototype chain has been broken.
+    * there is no relationship between SubType and SuperType
+    * */
+
+    /*
+    * combination inheritance -- combines prototype chaining and constructor stealing to ge the best of each approach
+    * */
+
+    function SuperType2(name) {
+        this.name = name;
+        this.colors = ["red", "blue", "green"];
+    }
+
+    SuperType2.prototype.sayName = function () {
+        console.log(this.name);
+    };
+
+    function SubType2(name, age) {
+
+        // inherit properties
+        SuperType2.call(this, name);
+
+        this.age = age;
+    }
+
+    // inherit methods
+    SubType2.prototype = new SuperType2();
+
+    SubType2.prototype.sayAge = function () {
+        console.log(this.age);
+    };
+
+    var instance1 = new SubType2('leo', 29);
+    instance1.colors.push('black');
+    console.log(instance1.colors); // ["red", "blue", "green", "black"]
+    instance1.sayName(); // leo
+    instance1.sayAge(); // 29
+
+    var instance2 = new SubType2('rick', 30);
+    console.log(instance2.colors); // ["red", "blue", "green"]
+    instance2.sayName(); // rick
+    instance2.sayAge(); // 30
+
+
+    /*
+    * Prototypal Inheritance --
+    * */
+
+    function object(o) {
+        function F() {}
+        F.prototype = o;
+        return new F();
+    }
+
+    // JS formalize the concept of prototypal inheritance by adding the Object.create() method
+
+    var person = {
+        name: "leo",
+        friends: ['rick', 'claire']
+    };
+
+    var anotherPerson = Object.create(person);
+    anotherPerson.name = 'greg';
+    anotherPerson.friends.push('rob');
+
+    var yetAnotherPerson = Object.create(person);
+    yetAnotherPerson.name = 'linda';
+    yetAnotherPerson.friends.push('barbie');
+
+    console.log(person.friends); // ["rick", "claire", "rob", "barbie"]
+    console.log(yetAnotherPerson.friends); // ["rick", "claire", "rob", "barbie"]
+
+    console.log(anotherPerson.name); // greg
+
+
+    /*
+    * parasitic inheritance --
+    * is similar to that of the parasitic constructor and factory pattern
+    * */
+
+    function createAnother(original) {
+        var clone = object(original);
+        clone.sayHi = function () {
+            console.log('hi');
+        };
+        return clone;
+    }
+    var person = {
+        name: 'leo',
+        friends: ['rick', 'claire']
+    };
+    var anotherPerson = createAnother(person);
+    anotherPerson.sayHi(); // hi
+
+
+    /*
+    * so, parasitic combination inheritance pattern ---
+    * is the most often-used pattern for inheritance in JS
+    * */
+
+    function inheritPrototype(subType, superType) {
+        var prototype = object(superType.prototype); // create object
+        prototype.constructor = subType; // augment object
+        subType.prototype = prototype; // assign object
+    }
+
+
+    function SuperType3(name) {
+        this.name = name;
+        this.colors = ['red', 'blue', 'green'];
+    }
+
+    SuperType3.prototype.sayName = function () {
+        console.log(this.name);
+    };
+
+    function SubType3(name, age) {
+        SuperType3.call(this, name);
+
+        this.age = age;
+    }
+
+    inheritPrototype(SubType3, SuperType3);
+    SubType3.prototype.sayAge = function () {
+        console.log(this.age);
+    }
 
 </script>
 </body>
