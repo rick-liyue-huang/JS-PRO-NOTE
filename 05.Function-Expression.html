@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+
+    /*
+    * function expression --
+    *
+    * understanding function hoisting is key to understanding the differences between function declaration and function expression
+    * */
+
+//    if (condition) {
+//        function sayHi() {
+//            console.log('hi');
+//        }
+//    } else {
+//        function sayHi() {
+//            console.log('yo');
+//        }
+//    }
+
+    // should use function expression
+//    var sayHi;
+//    if (conditon) {
+//        sayHi = function () {
+//            console.log('hi');
+//        };
+//    } else {
+//        sayHi = function () {
+//            console.log('yo');
+//        };
+//    }
+
+    // recall the createComparisonFunction()
+    function createComparisonFunction(propertyName) {
+
+        return function (obj1, obj2) {
+
+            var val1 = obj1[propertyName];
+            var val2 = obj2[propertyName];
+
+            if (val1 < val2) {
+                return -1;
+            } else if (val1 > val2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        };
+    }
+
+    /*
+    * createComparisonFunction() returns an anonymous function. the returned function will, presumably, be either assigned to a variable or otherwise called, but within
+    * createComparisonFunction() it is anonymous, any time a function is being used as a value, it is a function expression.
+    * */
+
+    /*
+    * Recursion --
+    * a recursion function typically is formed when a function calls itself by name.
+    * */
+    function factorial(num) {
+        if (num <= 1) {
+            return 1;
+        } else {
+            return num * factorial(num-1);
+        }
+    }
+
+    // but will produce an error
+//    var anotherFactorial = factorial;
+//    factorial = null;
+//    console.log(anotherFactorial(4));
+
+    // to avoid this error, we use arguments.callee
+    function factorial(num) {
+        if (num <= 1) {
+            return 1;
+        } else {
+            return num * arguments.callee(num - 1);
+        }
+    }
+
+    var anotherFactorial = factorial;
+    factorial = null;
+    console.log(anotherFactorial(4)); // 24
+
+    // we can use named function expression to achieve the same result
+    var factorial1 = function f(num) {
+        if (num <= 1) {
+            return 1;
+        } else {
+            return num * f(num - 1);
+        }
+    };
+
+    var anotherFactorial = factorial1;
+    factorial1 = null;
+    console.log(anotherFactorial(4)); // 24
+
+    /*
+    * closure --
+    * are functions that have access to variables from another function's scope. this is often accomplished by creating a function inside a function
+    * */
+
+    function createComparisonFunction(propertyName) {
+
+        return function (obj1, obj2) {
+            var val1 = obj1[propertyName];
+            var val2 = obj2[propertyName];
+
+            if (val1 < val2) {
+                return -1
+            } else if (val1 > val2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        };
+    }
+
+    // in the anonymous function accessing a variable (propertyName) from the outer function. this occurs because the inner function's scope chain includes the scope of createComparisonFunction().
+
+    /*
+    * when a function is called, an execution context is created, and its scope chain is created. the activation object for the function is initialized with values for arguments and any named arguments.
+    * the outer function's activation object is the second object in the scope chain. the process continues for all containing functions until the scope chain terminates with the global execution context.
+    * */
+
+    function compare(val1, val2) {
+        if (val1 < val2) {
+            return -1;
+        } else if (val1 > val2) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    var result = compare(5, 10);
+
+    /*
+    * this code defines a function named compare() that is called in the global execution context. when compare() is called for the first time, a new activation object is created that contains arguments,
+    * val1 and val2. the global execution context's variable object is next in the compare() execution context's scope chain, which contains this, result and compare.
+    *
+    * behind the scene, an object represents the variables in each execution context. the global context's variable object always exists, whereas local context variable objects, such as the one for compare
+    * exist only while the function is being executed. when compare() is defined, its scope chain is created, preloaded with the global variable object, and saved to the internal [[Scope]] property.
+    * after the function is called, an execution context is created and its scope chain is built up by copying the object in the function's [[Scope]] property. after that an activation object (which also
+    * acts as a variable object) is created and push to the front of the context's scope chain. here that means the compare() function's execution context has two variable objects in its scope chain:
+    * the local activation object and global variable object. note that the scope chain is essentially a list of pointers to variable objects and does not physically contain the objects.
+    *
+    * whenever a variable is acessed inside a function, the scope chain is searched for a variable with the given name. once the function has completed, the local avtivation object is destroyed, leaving
+    * only the global scope in memory,
+    *
+    * a function that is defined inside another function adds the containing function's activation object into its scope chain, so in createComparisonFunction(), the anonymous function's scope chain
+    * actually contains a reference to the activation object for createComparisonFunction(), when the anonymous function is returned from createComparisonFunction(), its scope chain has been initialized
+    * to contain the activation object from createComparisonFunction and the global variable object, this gives the anonymous function access to all of the variables from createComparisonFunction().
+    * but activation object from createComparisonFunction() cannot be destroyed once the function finishes executing, because a reference still exists in the anonymous function's scope chain.
+    * after createComparisonFunction() completes the scope chain for its execution context is destroyed, but its activation object will remain in memory until the anonymous function is destroyed.
+    * */
+
+    // create function
+    var compareNames = createComparisonFunction("name");
+
+    // call function
+    var restult = compareNames({name: 'leo'}, {name: 'rick'});
+
+    // dereference function - memory can now be reclaimed
+    compareNames = null;
+
+
+    /*
+    *  there is one side effect of this scope-chain configuration, the closure always gets the last value of any variable from the containing function., remember that the closure store a reference
+    *  to the entire variable object.
+    * */
+
+    function createFunction() {
+        var result = new Array();
+
+        for (var i = 0; i < 10; i++) {
+            result[i] = function () {
+                return i;
+            };
+        }
+        return result;
+    }
+
+   // so we change to
+    function createFunctions() {
+        var result = new Array();
+
+        for (var i = 0; i < 10; i++) {
+            result[i] = function (num) {
+                return function () {
+                    return num;
+                };
+            }(i);
+        }
+
+        return result;
+    }
+
+    
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="294b4e6a-5096-4875-90c0-4a2a3d3bd9bc" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/05.Function-Expression.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/04.OOP.html" afterPath="$PROJECT_DIR$/04.OOP.html" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -34,11 +34,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="04.OOP.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="04.OOP.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/04.OOP.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="327">
-              <caret line="815" column="30" selection-start-line="815" selection-start-column="30" selection-end-line="815" selection-end-column="30" />
+            <state relative-caret-position="129">
+              <caret line="816" column="5" selection-start-line="816" selection-start-column="5" selection-end-line="816" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="05.Function-Expression.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/05.Function-Expression.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="216">
+              <caret line="204" column="4" selection-start-line="204" selection-start-column="4" selection-end-line="204" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -61,6 +71,7 @@
       <list>
         <option value="$PROJECT_DIR$/03.Reference-type.html" />
         <option value="$PROJECT_DIR$/04.OOP.html" />
+        <option value="$PROJECT_DIR$/05.Function-Expression.html" />
       </list>
     </option>
   </component>
@@ -71,8 +82,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="88" />
-    <option name="y" value="515" />
+    <option name="x" value="35" />
+    <option name="y" value="468" />
     <option name="width" value="2082" />
     <option name="height" value="873" />
   </component>
@@ -202,15 +213,15 @@
       <workItem from="1480889576943" duration="7321000" />
       <workItem from="1480901331339" duration="6284000" />
       <workItem from="1480909870496" duration="14000" />
-      <workItem from="1480914054515" duration="15482000" />
+      <workItem from="1480914054515" duration="21360000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="29101000" />
+    <option name="totallyTimeSpent" value="34979000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="88" y="515" width="2082" height="873" extended-state="0" />
+    <frame x="35" y="468" width="2082" height="873" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.06964457" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -308,8 +319,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/04.OOP.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="327">
-          <caret line="815" column="30" selection-start-line="815" selection-start-column="30" selection-end-line="815" selection-end-column="30" />
+        <state relative-caret-position="129">
+          <caret line="816" column="5" selection-start-line="816" selection-start-column="5" selection-end-line="816" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/05.Function-Expression.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="204" column="4" selection-start-line="204" selection-start-column="4" selection-end-line="204" selection-end-column="4" />
           <folding />
         </state>
       </provider>
