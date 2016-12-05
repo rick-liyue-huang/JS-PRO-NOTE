@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+
+    /*
+    * JS defines an object as an unordered collection of properties each of which contains a primitive value, object or function.
+    * */
+    var person = new Object();
+    person.name = "rick";
+    person.age = 36;
+    person.job = "software engineer";
+    person.sayName = function () {
+        console.log(this.name);
+    };
+
+    // it creates an object person that has three properties and one method
+
+    var person1 = {
+        name: "leo",
+        age: 30,
+        job: "programmer",
+        sayName: function () {
+            console.log(this.name);
+        }
+    };
+
+    /*
+    * Types of Properties --
+    * these attributes are defined by the specification for implementation in JS engines [[Enumerable]]
+    *
+    * [[Configurable]] -- indicates if the property may be redefined by removing the property via delete, changing the property's
+    * attributes, or changing the property into an accessor property.
+    *
+    * [[Enumerable]] -- indicates if the property will be returned in a for-in loop. this is true for all properties defined directly on an
+    * object
+    *
+    * [[Writable]] -- indicates if the property's value can be changed. by default, this is true for all properties
+    *
+    * [[Value]] -- contains the actual data value for the property. this is the location from which the property's value is read and the
+    * location to which new values are saved. the default value for this attribute is undefined.
+    *
+    * note that: when a property is explicitly added to an object as in the previous example, [[Configurable]], [[Enumerable]], [[Writable]]
+    * are all set to true while the [[Value]] attribute is set to the assigned value.
+    *
+    * to change any of the default property attributes, we must use the JS Object.defineProperty() method, which accept three arguments:
+    * the object, the name of property, and a descriptor object. the properties on the descriptor object match the attribute names:
+    * configurable, enumerable, writable
+    * */
+
+    var person = {};
+    Object.defineProperty(person, "name", {
+        writable: false,
+        value: "rick"
+    });
+    console.log(person.name); // rick
+    person.name = "leo";
+    console.log(person.name); // rick
+
+    // similar rules apply to creating a nonconfigurable property
+    var person2 = {};
+    Object.defineProperty(person2, "name", {
+        configurable: false,
+        value: "leo"
+    });
+
+    console.log(person2.name);
+    delete person2.name;
+    console.log(person2.name); // leo
+
+    // which means that the property cannot be removed from the object. calling delete on the property has no effect in nonstrict mode
+    // and throw error in strict mode.
+
+    // once a property has been defined as nonconfigurable, it can not become configurable again.
+
+//    throws an error
+//    Object.defineProperty(person2, "name", {
+//        configurable: true
+//    });
+
+
+    /*
+    * note that: --
+    * although we can cal Object.defineProperty() multiple times for the same property, there are limits once configurable has been set to false
+    * when we are using Object.defineProperty(), the value for configurable, enumerable, and writable default to false unless otherwise specified.
+    * */
+
+    /*
+    * the upon properties are all data properties,
+    *
+    * now will be the accessor properties --
+    * accessor properties do not contain a data value, they contain a combination of a getter function and setter function.
+    *
+    * [[Configurable]] -- indicates if the property may be redefined by removing the property via delete.
+    *
+    * [[Enumerable]] -- indicates if the property will be returned in a for-in loop
+    *
+    * [[Get]] -- the function to call when the property is read from.
+    *
+    * [[Set]] -- the function to call when the property is written to.
+    * */
+
+    var book = {
+        _year: 2004,
+        edition: 1
+    };
+
+    Object.defineProperty(book, "year", {
+        get: function () {
+            return this._year;
+        },
+        set: function (newValue) {
+            if (newValue > 2004) {
+                this._year = newValue;
+                this.edition += newValue - 2004;
+            }
+
+        }
+    });
+
+    book.year = 2005;
+    console.log(book.edition); // 2
+
+    // the undersocore on _year is a common notation to indicate that a property is not intended to be accessed from outside of the object's
+    // method.
+
+    // a property with only a setter cannot be read and will return the value undefined in nonstrict mode, and will doing so throws an error
+    // in strict mode.
+
+    /*
+    * define multiple properties --
+    *
+    * */
+
+    var book = {};
+    Object.defineProperties(book, {
+        _year: {
+            value: 2004
+        },
+
+        edition: {
+            value: 1
+        },
+        year: {
+            get: function () {
+                return this._year;
+            },
+            set: function (newValue) {
+                if (newValue > 2004) {
+                    this._year = newValue;
+                    this.edition += newValue - 2004;
+                }
+            }
+        }
+    });
+
+    /*
+    *  it can retrieve the property descriptor for a given property by using Object.getOwnPropertyDescriptor() method
+    * */
+
+    var descriptor = Object.getOwnPropertyDescriptor(book, "_year");
+    console.log(descriptor.value); // 2004
+    console.log(descriptor.configurable); // false
+    console.log(typeof descriptor.get); // undefined
+
+    var descriptor = Object.getOwnPropertyDescriptor(book, "year");
+    console.log(descriptor.value); // undefined
+    console.log(descriptor.enumerable); // false
+    console.log(typeof descriptor.get); // function
+
+
+    /*
+    * Object Creation ---
+    *
+    *
+    *
+    * */
+
+    /*
+    * The factory pattern --
+    *
+    * function createPerson() accept arguments with which to build an object with all of the necessary information to represent a Person
+    * object.
+    *
+    * the factory pattern didnot address the issue of object identification.
+    * */
+
+    function createPerson(name, age, job) {
+        var o = new Object();
+        o.name = name;
+        o.age = age;
+        o.job = job;
+        o.sayName = function () {
+            console.log(this.name);
+        };
+
+        return o;
+    }
+
+    var person1 = createPerson("leo", 20, "software engineer");
+    var person2 = createPerson("rick", 40, "programmer");
+
+
+    /*
+    * the Constructor pattern ---
+    * to define custom constructors that define properties and methods for the type of the object.
+    *
+    * there is no object being created explicitly, the properties and methods are assigned directly onto the this object, there is no return statement
+    *
+    * it create a new object, assign the this value of the constructor to the new object, execute the code inside the constructor, return the new object
+    *
+    * defining our own constructors ensure that instances can be identified as a particular type latter on, which is a great advantage over
+    * the factory pattern.
+    * */
+    function Person(name, age, job) {
+        this.name = name;
+        this.age = age;
+        this.job = job;
+        this.sayName = function () {
+            console.log(this.name);
+        }
+    }
+
+    var person3 = new Person("rick", 40, "software engineer");
+    var person4 = new Person("leo", 89, "programmer");
+
+    console.log(person3.constructor === Person); // true
+    // the constructor property was originally intended for use in identifying the object type.
+    // and the instanceOf operator is considered be the safer way
+    console.log(person4 instanceof Person); // true
+
+
+    /*
+    * Constructors are just Functions,
+    * */
+
+    // use as a constructor
+//    var person = new Person("rick", 28, "software");
+//    person.sayName(); // rick
+
+    // call as a function
+//    Person("leo", 27, "Doctor");
+//    window.sayName(); // leo
+
+    // remember that the this object always points to the Global object when a function is called without an explicitly set this value.
+
+    //call in the scope of another object
+//    var o = new Object();
+//    Person.call(o, "rick", 30, "nurse");
+//    o.sayName(); // leo
+
+    // the major downside to constructors is that methods are created once for each instance.
+    // so person1.sayName !== person2.sayName.
+
+    /*
+    * to avoid the problem mentioned
+    * the prototype pattern --
+    *
+    * each function is created with a prototype property, which is an object containing properties and methods that should be available to
+    * instances of a particular reference type. This object is literally a prototype for the object to be created once the constructor is called.
+    * the benefit of using the prototype is that all of its properties and methods are shared among object instances. instead of assigning object
+    * information in the constructor, they can be assigned directly to the prototype.
+    *
+    * */
+
+    function Person() {
+    }
+
+    Person.prototype.name = "rick";
+    Person.prototype.age = 29;
+    Person.prototype.job = "programmer";
+    Person.prototype.sayName = function() {
+        console.log(this.name);
+    };
+
+    var p1 = new Person();
+    p1.sayName(); // rick
+
+    var p2 = new Person();
+    p2.sayName(); // rick
+
+    console.log(p1.sayName === p2.sayName); // true
+
+
+    /*
+    * how prototype work --
+    * by drawing the figure
+    * whenever a function is created, its prototype property is also created according to a specific set of rules. all prototype automatically
+    * get a property called constructor that points back to the function on which it is a property.
+    * Person.prototype.constructor ==== Person
+    *
+    * each time the constructor is called to create a new instance, that instance has an internal pointer to the constructor's prototype.
+    * __proto__, [[Prototype]]
+    * */
+
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
