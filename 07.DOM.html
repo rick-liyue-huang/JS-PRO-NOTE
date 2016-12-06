@@ -6,5 +6,224 @@
 </head>
 <body>
 
+<script>
+    /*
+    * DOM is an application programming interface for HTML and XML.
+    * any HTML and XML document can be represented as hierarchy of nodes using the DOM.
+    * <html> called the document element. the document element is the outermost element in the document within which all other elements exist.
+    *
+    * The node type:
+    * Node.ELEMENT_NODE (1)
+    * Node.ATTRIBUTE_NOTE(2)
+    * Node.TEXT_NODE(3)
+    * Node.CDATA_SECTION_NODE(4)
+    * Node.DOCUMENT_NODE(9)
+    * */
+//    if (someNode.nodeType === Node.ELEMENT_NODE) {
+//        console.log("Node is an element");
+//    }
+
+    // be better
+//    if (someNode.nodeType == 1) {
+//        console.log('node is an element');
+//    }
+
+    /*
+    * two properties, nodeName and nodeType give specific information about the node.
+    * */
+//    if (someNode.nodeType == 1) {
+//        value = someNode.nodeName; // will be the element's tag name
+//    }
+
+    /*
+    * node relationship --
+    * each node has a childNodes property containing a NodeList. NodeList is an array-like object used to store an ordered list of nodes that are accessible by position.
+    * */
+    var firstChild = someNode.childNodes[0];
+    var secondChild = someNode.childNodes.item(1);
+    var count = someNode.childNodes.length;
+
+    // we also can convert NodeList objects into arrays using slice()
+    var arrayOfNodes = Array.prototype.slice.call(someNode.childNodes, 0);
+
+    // or get the compatible pattern
+    function convertToArray(nodes) {
+        var array = null;
+        try {
+            array = Array.prototype.slice.call(nodes, 0); // non-IE and Ie9+
+
+        } catch (e) {
+            array = new Array();
+            for (var i = 0, len = nodes.length; i < len; i++) {
+                array.push(nodes[i]);
+            }
+        }
+        return array;
+    }
+
+    /*
+    * the convertToArray() function first attempt to use the easiest manner of creating an array.
+    * each node has a parentNode property pointing to its parent in the document tree.
+    * and also may have previousSibling and nextSibling property.
+    * */
+    if (someNode.nextSibling === null) {
+        console.log("last node in the parent's childNodes list");
+    } else if (someNode.previousSibling == null) {
+        console.log("first onde in the parent's childNodes list.");
+    }
+
+    // note that if there's only one child node, both nextSibling and previousSibling will be true
+
+    /*
+    * another relationship exists between a parent node and its first and last child nodes. the firstChild and lastChild.
+    * someNode.firstChild === someNode.childNodes[0]
+    * someNode.lastChild === someNode.childNodes[someNode.childNodes.length - 1]
+    * */
+
+    // another convenience method is hasChildNodes(), which returns true if the node has one or more child nodes and is more efficient than querying the length of the childNodes list.
+    // ownerDocument property is a pointer to the document node that represents the entire document
+
+    /*
+    * manipulate nodes --
+    *
+    * appendChild(), which adds a node to the end of the childNotes list.
+    * */
+    var returnedNode = someNode.appendChild(newNode);
+    console.log(returnedNode == newNode); // true
+    console.log(someNode.lastChild == newNode);
+
+    // insertBefore() --
+    returnedNode = someNode.insertBefore(newNode, null);
+    console.log(newNode == someNode.lastChild); // true
+
+    returnedNode = someNode.insertBefore(newNode, someNode.firstChild);
+    console.log(returnedNode == newNode);
+    console.log(returnedNode == someNode.firstChild);
+
+    // insert before last child
+    returnedNode = someNode.insertBefore(newNode, someNode.lastChild);
+    console.log(newNode = someNode.childNodes[someNode.childNodes.length - 2]); // true
+
+    // replaceChild() method accept two arguments: the node to insert and the node to replace.
+    // replace first child
+    var returnedNode = someNode.replaceChild(newNode, someNode.firstChild);
+    returnedNode = someNode.replaceChild(newNode, someNode.lastChild);
+
+    // removeChild()
+    var formerFirstChild = someNode.removeChild(someNode.firstChild);
+    var formerLastChild = someNode.removeChild(someNode.lastChild);
+
+    /*
+    * cloneNode(), which creates an exact clone of the node on which its called, deep clone will clone the entire subtree. the false only the initial node is cloned'
+    * */
+    var deepList = myList.cloneNode(true);
+    console.log(deepList.childNodes.length); // 3
+
+    var shallowList = myList.cloneNode(false);
+    console.log(shallowList.childNodes.length); // 0
+
+    // the last remaining method is normalize(). its sole job is to deal with text nodes in a document subtree
+
+    /*
+    * the Document Type --
+    * nodeType is 9
+    * nodeName is "#document
+    * parentNode is null
+    * ownerDocument is null
+    * child nodes may be a DocumentType, Element
+    * */
+
+    var html = document.documentElement;
+    console.log(html === document.childNodes[0]); // true
+    console.log(html === document.firstChild); // true
+
+    var body = document.body;
+    // document.documentElement and document.body are supported in all major browsers
+
+    // document object as an instance of HTMLDocument,
+    // <title>
+
+    // get the document title
+    var originalTitle = document.title;
+
+    // set the document title
+    document.title = "new page title";
+
+
+    /*
+    * Location Elements -- getElementById() and getElementsByTagName --
+    * and also contains some special collections:
+    * document.anchors, document.applets, document.forms, document.images, document.links.
+    * */
+
+    /*
+    * document writing --
+    * this capability comes in the form of four methods: write(), writeln(), open(), close()
+    * write() simply adds the text as is, whereas writeln() appends a new-line character (\n) to the end of the string
+    * */
+//    document.write("<strong>" + (new Date()).toString() + "</strong>strong>");
+    // open() and close() methods are used to open and close the web page output stream.
+
+
+    /*
+    * element type --
+    * nodeType is 1
+    * nodeName is the element's tag name
+    * nodeValue is null
+    * parentNode may be a Document or element
+    *
+    * */
+
+    var div = document.getElementById("myDiv");
+    console.log(div.getAttribute('id'));
+    console.log(div.getAttribute('class'));
+    console.log(div.getAttribute('title'));
+    console.log(div.getAttribute('lang'));
+    console.log(div.getAttribute('dir'));
+
+    // getAttribute and setAttribute()
+
+    div.setAttribute('id', 'someOtherId');
+    div.removeAttribute('class');
+
+    var id = element.attributes.getNamedItem('id').nodeValue;
+
+    var id = element.attributes['id'].nodeValue;
+</script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
