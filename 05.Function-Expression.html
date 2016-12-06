@@ -202,8 +202,371 @@
         return result;
     }
 
-    
+    /*
+    * the this object --
+    * using the this object inside closures introduces some complex behaviors. the this object is bound at runtime based on the context in which
+    * a function is executed: when used inside global functions, this is equal to window in nonstrict mode and undefined in strict mode.where this is
+    * equal to the object when called as an object method.
+    *
+    * anonymous functions are not bound to an object in this context, meaning the this object points to window unless executing in strict mode.
+    * */
 
+    // for example,
+    var name = "The window";
+    var object = {
+        name: "my object",
+        getNameFunc: function () {
+            return function () {
+                return this.name;
+            }
+        }
+    };
+    console.log(object.getNameFunc()()); // the window
+
+    /*
+    * remember that each function automatically gets two special variables as soon as the function is called: this and arguments. an inner
+    * function can never access these variables directly from an outer function. it is possible to allow a closure access to a different this
+    * object by storing it in another variable that the closure can access.
+    * */
+
+    var name = "the window";
+    var object = {
+        name: "my object",
+
+        getNameFunc: function () {
+            var that = this;
+            return function () {
+                return that.name;
+            };
+        }
+    };
+    console.log(object.getNameFunc()()); //my object
+
+    /*
+    * here show the difference between this example and the previous one. before defining the anonymous function, a variable named that is assigned
+    * equal to the this object. when the closure is defined, it has access to that, since it is a uniquely named variable in the containing
+    * function. even after the function is returned, that is still bound to object, so calling object.getNameFunc()() return "my object"
+    * */
+
+    /*
+    * avoid memory leak --
+    * */
+
+    function assignHandler() {
+        var element = document.getElementById("someElement");
+        var id = element.id;
+
+        element.onclick = function () {
+            console.log(id);
+        };
+
+        element = null;
+    }
+
+    /*
+    * here, a copy of element's ID is stored in a variable that is used in the closure, eliminating the circular reference. the closure has
+    * a reference to the containing function's entire activation object, which contains element. even if the closure does not reference element
+    * directly, a reference is still stored in the containing function's activation object. it is necessary, therefore to set the element variable
+    * equal to null.so decrements its reference count, ensuring that the memory can be reclaimed when appropriate.
+    * */
+
+
+    /*
+    * mimiking block scope --
+    * JS has not concept of block-level scoping, meaning that variables defined inside of block statements are actually created in the containing
+    * function.
+    *
+    * in JS the variable i is defined as part of the outputNumbers() activation object, meaning it is accessible inside the function from that
+    * point on.
+    * */
+
+    function outputNumbers(count) {
+        for (var i = 0; i < count; i++) {
+            console.log(i);
+        }
+
+        var i; // variable redeclared/
+        console.log(i); // count
+    }
+    outputNumbers(10); // 1-10
+
+    /*
+    * !! JS will never tell you if you have declared the same variable more than once, it simply ignores all subsequent declarations.
+    *
+    * anonymous functions can be used to mimic block scoping and avoid such problems --- iife--immediately invoked function expression
+    * */
+
+    (function () {
+        // block code here
+    })();
+
+    // for example
+    function outputNumbers1(count) {
+        (function () {
+            for (var i = 0; i < count; i++) {
+                console.log(i);
+            }
+        })();
+
+//        console.log(i); // causes an error
+    }
+    outputNumbers1(8);
+
+    (function () {
+        var now = new Date();
+        if (now.getMonth() == 0 && now.getDate() == 1) {
+            console.log("happy new year!");
+        }
+    })(); // will output the string on 01/01
+
+
+    /*
+    * private variables --
+    * any variables defined inside a function is considered private since it is inaccessible outside that function.
+    * this includes function arguments, local variables, and functions defined inside other functions.
+    * */
+    function add(num1, num2) {
+        var sum = num1 + num2;
+        return sum;
+    }
+    // here has three private variables: num1, num2, sum.
+    // if a closure were to be created inside this function, it would have access to these variables through its scope chain.
+
+
+    /*
+    * a privileged method -- is a public method that has access to private variables and or private functions.
+    *
+    * here has two ways to create privileged methods on objects
+    * */
+
+    // the first one is to do so inside a constructor
+
+    function MyObject() {
+        // private variables and functions
+        var privateVariable = 10;
+
+        function privateFunction() {
+            return false;
+        }
+
+        // privileged method
+        this.publicMethod = function () {
+            privateVariable++;
+            return privateFunction();
+        };
+    }
+
+    // this pattern defines all private variables and functions inside the constructor. then privileged methods can be created to
+//    access those privatee members
+/*
+*   this works because the privileged methods,when defined in the constructor, become closures with full access to all variales and functions
+*   defined inside the constructor's scope. here, the variable privateVariables and privateFunction() are accessed only by publicMethod(). once
+*   an instance of MyObject is created, there is no way to access private members, but by way of publicMethod().
+* */
+
+// we also can define private and privileged members to hide data that should not be changed directly.
+
+    function Person(name) {
+
+        this.getName = function () {
+            return name;
+        };
+
+        this.setName = function (value) {
+            name = value;
+        };
+
+    }
+
+    var person = new Person('rick');
+    console.log(person.name); // undefined
+    console.log(person.getName()); // rick
+    person.setName('leo');
+    console.log(person.getName()); // leo
+
+    /*
+    * privileged methods can also be created by using a private scope to define the private variables or functions
+    * */
+
+    (function () {
+        //private variables and functions
+        var privateVariable = 10;
+
+        function privateFunction() {
+            return false;
+        }
+
+        // constructor
+        MyObject = function () {
+        };
+
+        // public and privileged methods
+        MyObject.prototype.publicMethod = function () {
+            privateVariable++;
+            return privateFunction();
+        }
+    })();
+
+    // the main difference between this pattern and the previous one is that private variables and functions are shared among instances, since
+    // the privileged method is defined on the prototype, all instances use that same function.
+    // the privileged method, being a closure, always holds a reference to the containing scope.
+
+    // for example
+        (function () {
+            var name = "";
+
+            Person = function (value) {
+                name = value;
+            };
+
+            Person.prototype.getName = function () {
+                return name;
+            };
+            Person.prototype.setName = function (value) {
+                name = value;
+            };
+        })();
+
+        var person1 = new Person("Nicholas");
+        console.log(person1.getName()); //”Nicholas”
+        console.log(person1.setName("Greg"));
+        console.log(person1.getName()); //”Greg”
+
+        var person2 = new Person("Michael");
+        console.log(person1.getName()); //”Michael”
+        console.log(person2.getName()); //”Michael”
+
+    /*
+    * the Module Pattern --
+    * the module pattern does the same thing for singletons, singletons are objects of which there will only ever be one instance.
+    * traditionally, singletons are created in JS using object literal notation.
+    * */
+
+        var singleton = {
+        name: 'rick',
+        method: function () {
+            // method code here
+        }
+    };
+
+    // the module pattern augment the basic singleton to allow for private members and privileged methods
+        var singleton1 = function () {
+
+        // private variables and functions
+        var privateVariable = 10;
+
+        function privateFunction() {
+            return false;
+        }
+
+        // privileged methods and properties
+        return {
+            publicProperty: true,
+            publicMethod: function () {
+                privateVariable++;
+                return privateFunction();
+            }
+        };
+    }();
+
+    /*
+    * the module pattern uses an anonymous function that returns an object, inside of the anonymous function, the private variables and functions
+    * are defined first, after that, an object literal is returned as the function value. that object literal contains only properties and methods
+    * that should be public. since the object is defined inside the anonymous function, all of the public methods have access to the private variables
+    * and functions. essentially, the object literal defines the public interface for the singleton.
+    *
+    * this is useful when singleton requires some sort of initialization and access to private variables.
+    * */
+
+         var application = function () {
+
+        // private variables and function
+        var components = new Array();
+
+        // initialization
+        components.push(new BaseComponent());
+
+        // public interface
+        return {
+            getComponent: function () {
+                return components.length;
+            },
+
+            registerComponent : function (component) {
+                if (typeof component == "object") {
+                    components.push(component);
+                }
+            }
+        }
+    }();
+
+        /*
+        * in web application, its quite common to have a singleton that manages application-level information. this simple example creates an
+        * application object that manages components. when the object is first created, the private components array is created and a new instance
+        * of BaseComponent is add to its list. the code for BaseComponent is not important, it is used only to show initialization in the example.
+        * the getComponentCount and registerComponent method are privileged methods with access to the components array.
+        * the module pattern is useful for cases like this, when a singleton object must be created and initialized with some data and expose public
+        * methods that have access to private data.
+        *
+        * every singleton created in this manner is an instance of Object.
+        * */
+
+
+        /*
+        * another take on the module pattern calls for the augmentation of the object before returning it, this pattern is useful when the singleton
+        * object needs to be an instance of a particular type but must be augmented with additional properties and methods
+        * */
+
+        var singleton2 = function () {
+            // private variables and functions
+            var privateVariable = 10;
+
+            function privateFunction() {
+                return false;
+            }
+
+            // create object
+            var object = new CustomType();
+
+            // add privileged method
+            object.publicProperty = true;
+
+            object.publicMethod = function () {
+                privateVariable++;
+                return privateFunction();
+            };
+
+            // return the object
+            return object;
+        }();
+
+        // so we can get
+        var application1 = function () {
+
+            var components = new Array();
+
+            // initialize
+            components.push(new BaseComponent());
+
+            // create a local copy of application
+            var app = new BaseComponent();
+
+            // public interface
+            app.getComponentCount = function () {
+                return components.length;
+            };
+
+            app.registerComponent = function (component) {
+                if (typeof component == "object") {
+                    components.push(component);
+                }
+            };
+            // return it
+            return app;
+         }();
+
+        // the main difference is the creation of a variable named app that is new instance of BaseComponent. this is the local version of what
+    // will become the application object.
 
 </script>
 </body>
