@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    /*
+    * understanding the window object, controlling window frames and pop-ups, page information from the
+    * location object and using the navigator object to learn about the browser.
+    *
+    * at the core of the BOM is the window object, which represents an instance of the browser.
+    * the window object serves a dual purpose in browsers, acting as the JS interface to the browser window
+    * and the JS Global object.
+    * this means that every object, variable, and function defined in a web page uses window as its global object
+    * and has access to methods
+    * */
+
+    /*
+    * the global scope --
+    * all variables and functions declared globally become properties and methods of the window object
+    * */
+
+    var age = 30;
+    function sayAge() {
+        console.log(this.age);
+    }
+    console.log(window.age); // 30
+    window.sayAge(); // 30
+
+    /*
+    * there is a slight difference between defining a global variable and defining a property directly on window: global vairables cannot be removed using the delete operator
+    * */
+
+    var age = 20;
+    window.color = 'red';
+
+    delete window.age; //
+    delete window.color;
+
+    console.log(window.age); // 20, delete no working
+    console.log(window.color); // undefined
+
+    //another thing to keep in mind: attempting to access an undeclared variable throws an error, but it is possible to check for the existence of a potentially undeclared
+    // variable by looking on the window object.
+
+//    var newValue = oldValue; // throw an error
+
+    var newValue1 = window.oldValue1; // does not throw an error, because its a property lookup.
+
+    /*
+    * window relationship and frames --
+    * if page contains frames, each frame has its own window object and is stored in the frames collection, within the frames collection, the window objects are indexed both by number
+    * 0, gonging from left to right and then row by row. and by the the name of the frame, each window object has a name property containing the name of the frame.
+    * */
+
+    /*
+    *  window position --
+    *
+    * */
+    var leftPos = (typeof window.screenLeft == "number") ?
+                    window.screenLeft : window.screenX;
+    var rightPos = (typeof window.screenTop == "number") ?
+                    window.screenTop : window.screenY;
+
+
+    // moveTo() and moveBy() methods
+
+    // move the window to the upper-left coordinate
+    window.moveTo(0, 0);
+
+    // move the window down by 100 pixels
+    window.moveBy(0, 100);
+
+    // move the window to position (200, 300)
+    window.moveTo(200, 300);
+
+    // move the window left by 50 pixels
+    window.moveBy(-50, 0);
+
+    // window size
+    //it is possible to get the dimensions of the page viewport
+    var pageWidth = window.innerWidth;
+    var pageHeight = window.innerHeight;
+
+    if (typeof pageWidth != "number") {
+        if (document.compatMode == "CSS1Compat") {
+            pageWidth = document.documentElement.clientWidth;
+            pageHeight = document.documentElement.clientHeight;
+        } else {
+            pageWidth = document.body.clientWidth;
+            pageHeight = document.body.clientHeight;
+        }
+    }
+
+    // resizeTo and resizeBy --
+    // resize to 100 x 100
+    window.resizeTo(100, 100);
+
+    // resize to 200 x 150
+    window.resizeBy(100, 50);
+
+    // resize to 300 x 300
+    window.resizeTo(300, 300);
+
+    // window open and navigating
+//    window.open("http://www.google.com", "topFrame"); // will load the website of google.com
+//    window.open("http://www.baidu.com", "height=400, width=400, top=10,left=10,resizable=yes");
+
+    /*
+    * intervals and timeouts --
+    * */
+
+    setTimeout(function () {
+        console.log("hello timeout");
+    }, 1000);
+
+    // when setTimeout() is called, it returns a numeric ID fro the timeout. the timeout ID is unique identifier for the scheduled code that can be to cancel the timeout
+    var timeoutId = setTimeout(function () {
+        console.log("hello world");
+    }, 2000);
+
+    clearTimeout(timeoutId);
+
+    // for setInterval --
+    var num = 0;
+    var max = 10;
+    var intervalId = null;
+
+    function incrementNumber() {
+        num++;
+        console.log(num);
+        // if the max has been reached, calcel all pending executing
+        if (num == max) {
+            clearInterval(intervalId);
+            console.log('done');
+        }
+    }
+    intervalId = setInterval(incrementNumber, 500); // done
+
+    // also can be done by settimeout()
+    var num = 0;
+    var max = 10;
+    function incrementNumber1() {
+        num++;
+
+        // if the max has not been reached, set another timeout
+        if (num < max) {
+            setTimeout(incrementNumber1, 500);
+        } else {
+            console.log('ok');
+        }
+    }
+    setTimeout(incrementNumber1, 500);
+
+
+    /*
+    * system dialog --
+    * alert(), confirm() and prompt()
+    * */
+
+    if (confirm('are u sure?')) {
+        alert('im sure');
+    } else {
+        alert('im sorry');
+    }
+
+    var result = prompt('what is your name');
+    if (result !== null) {
+        alert('welcome, ' + result);
+    }
+
+
+    /*
+     * client detection remains one of the most controversial topics in web development. the idea that borwsers should support a common set of functionality pervades most conversations
+     * on topic.
+     * design for the most common solution first and then augment it with browser-specific solutions later.
+     * */
+
+    /*
+     * capability detection --
+     * the most commonly used and widely accepted form of client detection is called capability detection.
+     * */
+
+    function getElement(id) {
+        if (document.getElementById) {
+            return document.getElementById(id);
+        } else if (document.all) {
+            return document.all[id];
+        } else {
+            throw new Error("no way to retrieve element");
+        }
+    }
+
+    /*
+     * the upon code is to return an element with the given ID, since document.getElementById() is the standard way of achieving this, it is tested for first.
+     * if the function exists, then it is used. otherwise a check is done to determine if document.all is available, if nether method is available, an error is thrown to indicate
+     * that the function won't work.
+     *
+     * there are two important concepts to understand in capability detection. as just mentioned, the most common way to achieve the result should be tested for first. testing for
+     * the most common solution ensures optimal code execution by avoiding multiple-condition testing in the common case
+     * the second important concept is that you must test for exactly what you want to use.
+     * */
+
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
