@@ -785,6 +785,96 @@
     *
     * */
 
+    // offset dimension -- offsetHeight and offsetWidth includes the border and padding
+    // offsetLeft and offsetTop start from border
+
+    /*
+    * the offset of an element on the page can roughly be determined by taking the offsetLeft and offsetTop
+    * properties and adding them to the same properties of the offsetParent, until get to the root element
+    * */
+    function getElementLeft(element) {
+        var actualLeft = element.offsetLeft;
+        var current = element.offsetParent;
+
+        while (current !== null) {
+            actualLeft += current.offsetLeft;
+            current = current.offsetParent;
+        }
+        return actualLeft;
+    }
+
+    function getElementTop(element) {
+        var actualTop = element.offsetTop;
+        var current = element.offsetParent;
+
+        while (current !== null) {
+            actualTop += current.offsetTop;
+            current = current.offsetParent;
+        }
+        return actualTop;
+    }
+
+    // all of the offset dimension properties are read-only and are calculated each time
+
+    /*
+    * client dimensions --
+    * client dimension only contains the padding but not the border, same as the viewport
+    * */
+    function getViewport() {
+        if (document.compatMode == "BackCompat") {
+
+            return {
+                width: document.body.clientWidth,
+                height: document.body.clientHeight
+            };
+        } else {
+            return {
+                width: document.documentElement.clientWidth,
+                height: document.documentElement.clientHeight
+            };
+        }
+    }
+
+    // scroll dimensions --
+    /*
+    * scrollHeight -- the total height of the content if there were no scrollBars present
+    * scrollWidth -- the total width of the content if there were no scrollbars present
+    * scrollLeft -- the number of pixels that are hidden to the left of the content area.
+    * */
+
+    var docHeight = Math.max(document.documentElement.scrollHeight, document.documentElement.clientHeight);
+    var docWidth = Math.max(document.documentElement.scrollWidth, document.documentElement.clientWidth);
+
+    /*
+    * determining element dimension --
+    *  a method called getBoundingClientRect() on each element, which returns a rectangle object that
+    *  has four properties: left, top, right, and bottom. these properties give the location of the element
+    *  on the page relative to the viewport.
+    * */
+
+    function getBoundingClientRect(element) {
+
+        if (typeof arguments.callee.offset != "number") {
+            var scrollTop = document.documentElement.scrollTop;
+            var temp = document.createElement('div');
+            temp.style.cssText = "position:absolute;left:0;top:0;";
+            document.body.appendChild(temp);
+            arguments.callee.offset = -temp.getBoundingClientRect().top - scrollTop;
+            document.body.removeChild(temp);
+            temp = null;
+        }
+
+        var rect = element.getBoundingClientRect();
+        var offset = arguments.callee.offset;
+
+        return {
+            left: rect.left + offset,
+            right: rect.right + offset,
+            top: rect.top + offset,
+            bottom: rect.bottom + offset
+        };
+    }
+
 
 </script>
 </body>
