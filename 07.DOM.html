@@ -186,10 +186,607 @@
     div.setAttribute('id', 'someOtherId');
     div.removeAttribute('class');
 
-    <!--var id = element.attributes.getNamedItem('id').nodeValue;-->
+//    var id = element.attributes.getNamedItem('id').nodeValue;
+//
+//    var id = element.attributes['id'].nodeValue;
 
-    <!--var id = element.attributes['id'].nodeValue;-->
-<!--</script>-->
+    // the one area where the attributes property is useful is to iterate over the attributes on an element
+    // this is most often when serializing a DOM structure into an XML or HTML string.
+    // the following code iterates over each attribute on an element
+    // and constructors a string in a format name="value" name="value";
+    /*
+    * this function uses an array to store the name-value pairs until the end. concatenating them with a space in
+    * between. this tech is frequently used when serializing into long strings
+    * */
+
+    function outputAttributes(element) {
+        var pairs = new Array(),
+            attrName,
+            attrValue,
+            i,
+            len;
+
+        for (i = 0, len = element.attributes.length; i < len; i++) {
+            attrName = element.attributes[i].nodeName;
+            attrValue = element.attributes[i].nodeValue;
+            pairs.push(attrName + "=\"" + attrValue + "\"");
+        }
+        return pairs.join(" ");
+    }
+
+    function outputAttributes1(element) {
+        var pairs = new Array(),
+            attrName,
+            attrValue,
+            i,
+            len;
+
+        for (i = 0, len = element.attributes.length; i < len; i++) {
+            attrName = element.attributes[i].nodeName;
+            attrValue = element.attributes[i].nodeValue;
+            if (element.attributes[i].specified) {
+                pairs.push(attrName + "=\"" + attrValue + "\"");
+            }
+        }
+        return pairs.join(" ");
+    }
+
+    // the upon code will ensure that only specified attributes are returned for IE 7 and earlier.
+
+
+    /*
+    * creating element ---
+    * document.createElement() method, which has one argument of the tag name of the element to create.
+    * */
+    var div = document.createElement("div");
+    // it also can add some attributes
+    div.id = "myNewDiv";
+    div.className = "box";
+
+    // and then put the new element to the DOM tree
+    document.body.appendChild(div);
+
+    // for IE
+    var div1 = document.createElement("<div id=\"myDiv\" class=\"box1\"></div>");
+
+    /*
+    * element children --
+    * childNodes has the different children count in different browser.
+    * so we have to check the childNode type before do something
+    * */
+    for (var i = 0, len = element.childNodes.length; i < len; i++) {
+        if (element.childNodes[i].nodeType == 1) {
+            // do processing..
+        }
+    }
+
+    /*
+    * text type --
+    * nodeType is 3
+    * nodeName is "#text"
+    * nodeValue is text contained in the node
+    * parentNode is an Element
+    * child nodes are not supported
+    *
+    * also has many methods --
+    * appendText(text), deleteData(offset, count), insertData(offset, text), replaceData(offset, count, text),
+    * splitText(offset), substringData(offset, count).nodeValue.length and data.length both return the length.
+    *
+    * no content, so no text node --   <div></div>
+    *
+    * white space content, so one text node -- <div> </div>
+    *
+    * content, so one text node -- <div>hello world!</div>
+    * */
+
+
+    // in order to get the text node
+    var textNode = div.firstChild;  // or div.childNodes[i]
+
+    // once a reference to the text node is retrieved, it can be changed like
+    div.firstChild.nodeValue = "some other message";
+
+    // also can do this
+    div.firstChild.nodeValue = "some <strong>other</strong> message";
+
+    // creating text node --
+    var textNode = document.createTextNode("<strong>hello</strong> world!");
+
+    // and will append the text to div element
+    var element = document.createElement('div');
+    element.className = "message";
+
+    var textNode = document.createTextNode("hello world");
+    element.appendChild(textNode);
+
+    var anotherTextNode = document.createTextNode("yippee");
+    element.appendChild(anotherTextNode);
+    // when a text node is added as a sibling of another text node, the text in those nodes is displayed without
+    // any space between them.
+
+    document.body.appendChild(element);
+
+
+    // normalize() method will create a single textnode
+    var element = document.createElement("div");
+    element.className = "message";
+
+    var textNode = document.createTextNode("hello world!");
+    element.appendChild(textNode);
+
+    var anotherTextNode = document.createTextNode("yipee");
+    element.appendChild(anotherTextNode);
+
+    document.body.appendChild(element);
+
+    console.log(element.childNodes.length); // 2
+
+    element.normalize();
+
+    console.log(element.childNodes.length); // 1
+    console.log(element.firstChild.nodeValue); // "hello world!yipee"
+
+    // it will never create sibling text nodes
+
+    /*
+    * slitting text node --
+    * splitText() method splits a text node into two text nodes. separating the nodeValue at a given offset.
+    * */
+
+    var elem = document.createElement('div');
+    elem.className = 'message';
+
+    var textNode = document.createTextNode('hello world');
+    elem.appendChild(textNode);
+
+    document.body.appendChild(elem);
+
+    var newNode = elem.firstChild.splitText(5);
+    console.log(elem.firstChild.nodeValue); // "hello"
+    console.log(newNode.nodeValue); // " world"
+    console.log(elem.childNodes.length); // 2
+
+    /*
+    * the attr Type --
+    * nodeTypeis 11
+    * nodeName is the attribute name
+    * nodeValue is the attribute Value
+    * parentNode is null
+    * has some methods: getAttribute(), setAttribute(), removeAttribute().
+    * has three properties on an Attr object: name, value, and specified, which is a boolean value indicating if the
+    * attribute was specified in code or if it is a default value.
+    * */
+
+    // create a attribute node
+    var attr = document.createAttribute("align");
+    attr.value = "left";
+    element.setAttributeNode(attr);
+
+    console.log(element.attributes['align'].value); // "left"
+    console.log(element.getAttributeNode("align").value); // 'left'
+    console.log(element.getAttribute('align'));
+
+    /*
+    * dynamic scripts --
+    * */
+    function loadScript(code) {
+        var script = document.createElement('script');
+        script.type = "text/javascript";
+        try {
+            script.appendChild(document.createTextNode(code));
+        } catch (e) {
+            script.text = code;
+        }
+
+        document.body.appendChild(script);
+    }
+
+    /*
+    * dynamic style --
+    *
+    * */
+    function loadStyleString(css) {
+        var style = document.createElement('style');
+        style.type = "text/css";
+
+        try {
+            style.appendChild(document.createTextNode(css));
+        } catch (e) {
+            style.stylesheet.cssText = css;
+        }
+        var head = document.getElementsByTagName('head')[0];
+        head.appendChild(style);
+    }
+
+    loadStyleString("body{background-color:red}");
+
+
+    /*
+    * manipulate tables --
+    *
+    * <table> element adds the following:
+    * caption, tBodies, tFoot, tHead, rows, createTHead, createTFoot, createCaption(),
+    * deleteTHead, deleteTFoot, deleteCaption, insertRow, rows, deleteRow, cells, deleteCell, insertCell.
+    * */
+    // create the table --
+    var table = document.createElement('table');
+    table.border = 1;
+    table.width = '100%';
+
+    // create the tbody
+    var tbody = document.createElement('tbody');
+    table.appendChild(tbody);
+
+    // create the first row
+    var row1 = document.createElement('tr');
+    tbody.appendChild(row1);
+    var cell1_1 = document.createElement('td');
+    cell1_1.appendChild(document.createTextNode("cell 1,1"));
+    row1.appendChild(cell1_1);
+
+    var cell2_1 = document.createElement('td');
+    cell2_1.appendChild(document.createTextNode("cell 2,1"));
+    row1.appendChild(cell2_1);
+
+    // create the second row
+    var row2 = document.createElement('tr');
+    tbody.appendChild(row2);
+    var cell1_2 = document.createElement('td');
+    cell1_2.appendChild(document.createTextNode('cell 1,2'));
+    row2.appendChild(cell1_2);
+
+    var cell2_2 = document.createElement("td");
+    cell2_2.appendChild(document.createTextNode('cell 2,2'));
+    row2.appendChild(cell2_2);
+
+    // add the table to the document body
+    document.body.appendChild(table);
+
+    // using well for nodeList.
+
+
+    /*
+    * selector API --
+    * one of the most popular capability of JS libraries is the ability to retrieve a number of DOM elements
+    * matching a pattern specified using CSS selectors. indeed, the library jQuery is built completely around the CSS
+    * selector queries of a DOM document in order to retrieve references to elements instead of using getElementByID
+    * and getElementByTagName()
+    *
+    * querySelector() method --
+    *
+    * */
+
+    // get the body element.
+    var body = document.querySelector('body');
+
+    // get the element with ID
+    var myDiv = document.querySelector('#myDiv');
+
+    // get first element with a class of selected
+    var selected = document.querySelector('.selected');
+
+    // get first image with class of button
+    var img = document.querySelector('img.button');
+
+    // querySelectorAll() -- accepts the same single arguments as querySelector() ,
+    // but returns all matching nodes instead of just one .
+    // it will return a nodeList.
+
+    // get all <em> elements in a <div>
+    var ems = document.querySelector('myDiv').querySelectorAll('em');
+
+    // get all elements with class of 'selected'
+    var selected = document.querySelectorAll('.selected');
+
+    //get all <strong> elements inside of <p> elements
+    var strongs = document.querySelectorAll('p strong');
+
+    // and then iterated
+    var i, len, strong;
+    for (i = 0, len = strongs.length; i < len; i++) {
+        strong = strongs[i];
+        strong.className = "important";
+    }
+
+    /*
+    * matchesSelector() ---
+    * will accept a sinhgle argument, a CSS selector, and returns true if the given element matches the selector
+    * or false if not.
+    * */
+    if (document.body.matchesSelector('body.page1')) {
+        // true
+    }
+
+    // to make use of this method, you may want to create a wrapper function
+    function matchesSelector(element, selector) {
+        if (element.matchesSelector) {
+            return element.matchesSelector(selector);
+        } else if (element.msMatchesSelector) {
+            return element.msMatchesSelector(selector);
+        } else if (element.mozMatchesSelector) {
+            return element.mozMatchesSelector(selector);
+        } else if (element.webkitMatchesSelector) {
+            return element.webkitMatchesSelector(selector);
+        } else {
+            throw new Error('not supported');
+        }
+    }
+
+
+    /*
+    * element traversal --
+    * befor IE9. IE did not return text nodes for white space in between elements while all of other browsers did
+    *
+    * it will add five more methods to confirm the element node
+    *
+    * childElementCount, firstElementChild, lastElementChild, previousElementSibling, nextElementSibling
+    * */
+
+    var i, len, child = element.firstElementChild;
+    while (child != element.lastElementChild) {
+        processChild(child); // already know its an element
+        child = child.nextElementSibling;
+    }
+
+
+    /*
+    *   HTML5 ----
+    *
+    *   HTML5 focus on the markup of language and deferring JS building to the DOM specification.
+     *
+     *   it add about Class-related addition
+    *
+    * */
+    // get all elements with a class containing "username" and "current", though it
+    // does not matter if one is declared before the other
+    var allCurrentUsernames = document.getElementsByClassName("username current");
+
+    // get all elements with a class of "selected" that exist in "myDiv" subtree
+    var selected = document.getElementById('myDiv').getElementsByClassName('selected');
+
+    // <div class=”bd user disabled”>...</div>
+
+    //it has three classes, to remove one of these classes, you need to split the class attribute into individual
+    //class, remove the unwanted class, and then create a string containing the remaining classes
+
+    // remove the "user" class
+
+    // first get list of class names
+    var classNames = div.className.split(/\s+/);
+
+    // find the class name to remove
+    var pos = -1,
+        i,
+        len;
+    for (i = 0, len = classNames.length; i < len; i++) {
+        if (classNames[i] === "user") {
+            pos = i;
+            break;
+        }
+    }
+
+    // remove the class name
+    classNames.splice(i, 1);
+
+    // set back the class name
+    div.className = classNames.join(" ");
+
+    // but in HTML5 , it will provide some simpler ways
+    // add(value), contain(value), remove(value), toggle(value)
+
+    div.classList.remove("disable");
+    div.classList.add('current');
+    div.classList.toggle('user');
+
+    // figure out what on the element now
+    if (div.classList.contains('bd') && !div.classList.contains('disabled')) {
+        // do something
+    }
+
+    // iterate over the class names
+    for (var i = 0, len = div.classList.length; i < len; i++) {
+        // dosomething(div.classList[i]);
+    }
+
+
+    /*
+    * focus on  Management --
+    *  document.activeElement
+    * */
+    var button = document.getElementById('myButton');
+    button.focus();
+    console.log(document.activeElement === button); // true
+    // by default, document.activeElement is set to document.body when document is first loaded.
+    // before the document is fully loaded, document.activeElement is null
+
+    //
+    var button = document.getElementById('myButton');
+    button.focus();
+    console.log(document.hasFocus()); // true
+
+
+    /*
+    * changes to HTMLDocument --
+    *
+    * the readyState property -- has two properties:
+    * loading and complete
+    * */
+    if (document.readyState == "complete") {
+        // do something
+    }
+
+
+    /*
+    * compatibility mode --
+    * */
+    if (document.compatMode == "CSS1Compt") {
+        console.log("standard mode");
+    } else {
+        console.log("quirks mode");
+    }
+
+
+    /*
+    * HTML5 introduces document.head to point the <head> element of a document to complement document.body
+    * */
+
+    var head = document.head || document.getElementsByTagName("head")[0];
+
+
+    /*
+    * character set properties
+    * */
+
+    console.log(document.charset); // utf-8
+    document.charset = "utf-16";
+
+    // defaultCharset property indicates what the default character set for the document should be based on
+    // default browser and system settings
+    if (document.charset != document.defaultCharset) {
+        console.log('custom character set being used');
+    }
+
+
+    /*
+    * custom data attributes --
+    * <div id=”myDiv” data-appId=”12345” data-myname=”Nicholas”></div>
+    * */
+    var div = document.getElementById('myDiv');
+
+   // get the values
+    var appId = div.dataset.appId;
+    var myName = div.dataset.myname;
+
+    // set the value
+    div.dataset.appId = 23456;
+    div.dataset.myname = 'rick';
+
+    // is there a 'myname' value?
+    if (div.dataset.myname) {
+        console.log('hello, ' + div.dataset.myname);
+    }
+
+
+    /*
+    * markup insertion --
+    *
+    * innerHTML() returns the HTML representing all of the child nodes, including elements, comments, and text nodes
+    *
+    * outerHTML() returns the HTML of the element on which it is called as well as its child nodes
+    * */
+
+    var itemsHtml = "";
+    for (var i = 0, len = values.length; i < len; i++) {
+        itemsHtml += "<li>" + values[i] + "</li>";
+    }
+    ul.innerHTML = itemsHtml;
+
+
+    /*
+    * scrollIntoView() methods exists on all HTML elements and scrolls the browser window or container element
+    * */
+
+    // make sure this element is visible
+    document.form[0].scrollIntoView();
+
+    /*
+    * children property is an HTMLCollection that contains ony an element's child nodes that are also elements
+    * */
+    var childCount = element.children.length;
+    var firstChild = element.children[0];
+
+    /*
+    * contains() --
+    *
+    * */
+    console.log(document.documentElement.contains(document.body)); // true
+
+    // innerText property --
+    // innerText works with all text content contained within an element, regardless of how deep in the subtree
+    // the text exists.
+
+    function getInnerText(element) {
+        return (typeof element.textContent == "string") ?
+            element.textContent : element.innerText;
+    }
+
+    function setInnerText(element, text) {
+        if (typeof element.textContent == "string") {
+            element.textContent = text;
+        } else {
+            element.innerText = text;
+        }
+    }
+
+    /*
+    * scrolling --
+    * scrollIntoViewIfNeeded(alignCenter), scrollByLines(linecount), scrollByPages(pagecount)
+    * */
+
+
+    /*
+    * DOM Level 2 3
+    * DOM level1 focuses on defining the underlyng structure of HTML and XML documents, DOM level2,3 build on
+    * this structure to introduce more interactivity and support for more advanced XML features.
+    *
+    * */
+
+
+    /*
+    *
+    * computedStyle ---
+    *
+    * <head>
+     <title>Computed Styles Example</title> <style type=”text/css”>
+     #myDiv {
+     background-color: blue; width: 100px;
+     height: 200px;
+     } </style>
+     </head> <body>
+     <div id=”myDiv” style=”background-color: red; border: 1px solid black”></div> </body>
+     </html>
+
+     * */
+
+    var myDiv = document.getElementById("myDiv");
+    var computedStyle = document.defaultView.getComputedStyle(myDiv, null);
+
+    console.log(computedStyle.backgroundColor); // red
+    console.log(computedStyle.width); // 100px
+    console.log(computedStyle.height); // 200px
+    console.log(computedStyle.border); // 1px solid black in some browser
+
+    // in IE
+    var mDiv = document.getElementById('myDiv');
+    var computedStyle = myDiv.currentStyle;
+
+    console.log(computedStyle.backgroundColor); // red
+    console.log(computedStyle.width); // 100px
+    console.log(computedStyle.height); // 200px
+    console.log(computedStyle.border); // undefined
+
+    // important to note that : the computedStyle in all browsers are all read-only!!!!!!
+
+    /*
+    * style sheet --
+    * */
+
+    function getStyleSheet(element) {
+        return element.sheet || element.stylesheet;
+    }
+    // get the style sheet for the first <link/> element
+
+    var link = document.getElementsByTagName('link')[0];
+    var sheet = getStyleSheet(link);
+
+
+    /*
+    * element dimension --
+    *
+    * */
+
+
+</script>
 </body>
 </html>
 
