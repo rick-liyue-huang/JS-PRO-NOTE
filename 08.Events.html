@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-
+<input type="button" id="mybtn2">
 <script>
 
     /*
@@ -37,7 +37,607 @@
 
     /*
     * DOM EVENT Flow --
+    * the event flow has three phases: the event capturing phase, target phase, event bubbling phase.
+    * event capturing phase occurs first, providing the opportunity to intercept events if necessary. next, the actually
+    * target receives the event. the final phase is bubbling, which allows a final response to the event.
+    *
+    * the actual target does not receive the event during the capturing phase. the next phase is at target, which fires
+    * on the target div, and is considered to be part of the bubbling phase in terms of event handling. the bubbling phase
+    * occurs and the event travels back up to the document.
     * */
+
+    /*
+    * event handlers --
+    * events are certain actions performed either by the user or by the browser itself. these event have names like
+    * click, load, mouseover.
+    * a function that is called in response to an event is called an event handler (or event listener).
+    * event handlers have names beginning with "on", so an event handler for click event is called onclick and an event
+    * handler for the load event is called onload.
+    *
+    * each event supported by a particular element can be assigned using an HTML attribute with the name of the event
+    * handler. the value of the attribute should be some JS code to execute.
+    *
+    * <input type="button" value="click me" onclick="alert('clicked')" />
+    * */
+
+    // also can define a function
+    function showMessage() {
+        console.log('hello world');
+    }
+
+    // <input type="button" value="click me" onclick="showMessage()" />
+
+    /*
+    * event handlers assigned in this way have some unique aspects, first, a function is created that wraps the
+    * attribute value. that function has a special local variable called event, which is the event object
+    * <input type="button" value="click me" onclick="alert('event.type')">
+    *
+    * this gives you access to the event object without needing to define it yourself and without needing to pull
+    * it from the enclosed function's argument list
+    *
+    * the this value inside of the function is equivalent to the event's target element
+    * <input type="button" value="click" onclick="alert(this.value)">
+    *
+    *
+    * an event handler is assigned by setting the property equal to a function
+    * */
+//    var btn = document.getElementById("myBtn");
+//    btn.onclick = function () {
+//        console.log('clicked');
+//    };
+
+    // in DOM 0, the event handler is considered to be a method of the element. the event handler, therefore, is run
+    // within the scope of element, meaning that this is equivalent to the element.
+//    var btn = document.getElementById("mybtn");
+//    btn.onclick = function () {
+//        console.log(this.id);
+//    };
+
+    // we can remove an event handler
+//    btn.onclick = null;
+
+    /*
+    * DOM level 2 event handlers --
+    * addEventListener(), removeEventListener().
+    * it will accept three arguments: event name to handle, the event handler function, and a boolean value indicating
+    * whether to call the event handler during the capturing phase (true) or bubbling phase (false)
+    *
+    * */
+
+//    var btn1 = document.querySelector("mybtn");
+//    btn.addEventListener("click", function () {
+//        console.log(this.id);
+//    }, false);
+    // the upon code adds an onclick event handler to a button that will be fired in the bubbling phase.
+    //the major advantage to using the DOM 2 method for adding event handlers is that multiple event handlers can
+    // be added.
+
+    var btn2 = document.getElementById("mybtn2");
+    btn2.addEventListener('click', function () {
+        console.log(this.id);
+    }, false);
+    btn2.addEventListener('click', function () {
+        console.log('hello world');
+    }, false);
+
+    /*
+    * if let the removeEventListener working , must focus on the same event.
+    * */
+    var btn = document.getElementById('myBtn');
+    var handler = function () {
+        console.log(this.id);
+    };
+
+    btn.addEventListener('click', handler, false);
+
+    // other code here
+    btn.removeEventListener('click', handler, false); // works
+
+    /*
+    * IE event handlers --
+    * attachEvent and detachEvent.
+    * */
+
+    var btn3 = document.getElementById('myBtn');
+    btn3.attachEvent('onclick', function () {
+        console.log('clicked');
+    });
+
+    // also need the same function.
+    var btn = document.getElementById('mybtn');
+    var handler2 = function () {
+        console.log(this.id);
+    };
+    btn.attachEvent('onclick', handler2);
+    // other code here
+    btn.detachEvent('onclik', handler2);
+
+
+    /*
+    *  cross-browser event handler --
+    *  to accommodate event handling in a cross-browser way, many developer end up either using a JS library that
+    *  abstract.
+    *  the first method to create is called addHandler(), and its job is to use the DOM level0 approach, the DOM 2
+    *  approach, or the IE approach to adding events, depending on which is available.
+    *  this method is attached to an object called EventUtil that will be used to aid in handling cross-browser differences.
+    *
+    *  the addHandler() method accepts three arguments: the element to act on, the name of the event, and the event
+    *  handler function.
+    * */
+
+    var EventUtil = {
+
+        addHandler : function (element, type, handler) {
+            if (element.addEventListener) {
+                element.addEventListener(type, handler, false);
+            } else if (element.attachEvent) {
+                element.attachEvent("on"+type, handler);
+            } else {
+                element['on' + type] = handler;
+            }
+        },
+
+        removeHandler: function (element, type, handler) {
+            if (element.removeEventListener) {
+                element.removeEventListener(type, handler, false);
+            } else if (element.detachEvent) {
+                element.detachEvent("on"+type, handler);
+            } else {
+                element["on"+type] = null;
+            }
+        }
+    };
+
+    // the tries will go from the most common to the least common.
+    var btn = document.getElementById('myBtn');
+    var handler = function () {
+        console.log('clicked');
+    };
+
+    EventUtil.addHandler(btn, 'click', handler);
+
+    // other code here
+
+    EventUtil.removeHandler(btn, 'click', handler);
+
+    /*
+    *  The event object --
+    *  when an event related to the DOM is fired, all of the relevant information is gathered and stored on an
+    *  object called event. this object contains basic information such as the element that caused the event,
+    *  the type of event that occures, and any other data that may be relevant to the particular event.
+    *
+    *  the DOM event type.
+    * */
+    btn.onclick = function (event) {
+        console.log(event.type); // 'click'
+    };
+
+    btn.addEventListener('click', function (event) {
+        console.log(event.type); // 'click'
+    }, false);
+
+    btn.onclick = function (event) {
+        console.log(event.currentTarget === this); // true
+        console.log(event.target === this);
+    };
+
+    document.body.onclick = function (event) {
+        console.log(event.currentTarget === document.body); // true
+        console.log(this === document.body);
+        console.log(event.target === document.getElementById('myBtn'));
+    };
+
+
+    // the type property is useful when you want to assign a single function to handle multiple events
+    var handler = function (event) {
+        switch (event.type) {
+            case 'click':
+                console.log('clicked');
+                break;
+            case 'mouseover':
+                event.target.style.backgroundColor = 'red';
+                break;
+            case 'mouseout':
+                event.target.style.backgroundColor = "";
+                break;
+        }
+    };
+    btn.onclick = handler;
+    btn.onmousemove = handler;
+    btn.onmouseout = handler;
+
+    // preventDefault() method is used to prevent the default action of a particular event, for example, the default
+    // behavior of a link, for example is to navigate to the URL specified in its href
+    var link = document.getElementById('myLink');
+    link.onclick =function (event) {
+        evet.preventDefault(); //
+    };
+
+    // stopProgagation() method stops the flow of an event through the DOM structure immediately, cancelling any
+    // further event capturing or bubbling before it occurs.
+
+    // for example, an event handler added directly to button can call stopPropagation() to prevent an event
+    // handler on document.body.
+    var btn = document.getElementById('myBtn');
+    btn.onclick = function (event) {
+        console.log('clicked');
+        event.stopPropagation();
+    };
+
+    document.body.onclick = function () {
+        console.log('body clicked');
+    };
+    // the upon code about body can not occurs because of stopPropagation()
+
+    // eventPhase property aids in determining what phase of event flow is currently active.
+    // 1 for capture phase, 2 for target phase, 3 for bubble phase
+    // whenerver eventPhase is 2, this, target, currentTarget are always equal.
+
+
+    // for the different browsers
+    /*
+    *  the cross-browser event object -- including IE
+    * */
+
+    var EventUtil = {
+        addHandler: function (element, type, handler) {
+            // code removed for printing
+        },
+
+        getEvent: function (event) {
+            return event ? event : window.event;
+        },
+
+        getTarget: function (event) {
+            return event.target || event.srcElement;
+        },
+
+        preventDefault: function (event) {
+            if (event.preventDefault) {
+                event.preventDefault();
+            } else {
+                event.returnValue = false;
+            }
+        },
+
+        removeHandler: function (element, type, handler) {
+            // code removed for printing
+        },
+
+        stopPropagation: function (event) {
+            if (event.stopPropagation) {
+                event.stopPropagation();
+            } else {
+                event.cancelBubble = true;
+            }
+        }
+    };
+
+    // so we do that
+    btn.onclick = function (event) {
+        event = EventUtil.getEvent(event);
+    };
+
+    var link = document.getElementById('myLink');
+    link.onclick = function (event) {
+        event = EventUtil.getEvent(event);
+        EventUtil.preventDefault(event);
+    };
+
+
+
+
+    /*
+    *
+    * event types --- user interface events, focus events, mouse events, wheel events, text event keyboard events
+    * composition events mutation events
+    * */
+
+    // load event is perhaps the most often used event in JS, for teh window object, the load event fires when the
+    // entire page has been loaded.
+    var img = document.getElementById('myImage');
+    EventUtil.addHandler(image, 'load', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log(EventUtil.getTarget(event).src);
+    });
+
+    /*
+    *  when creating a new <img> element, an event handler can be assigned to indicate when the image has been
+    *  loaded. in this case, its important to assign the event before assignment the src property
+    * */
+
+    EventUtil.addHandler(window, 'load', function () {
+        var image = document.createElement('img');
+        EventUtil.addHandler(image, 'load', function (event) {
+            event = EventUtil.getEvent(event);
+            console.log(EventUtil.getTarget(event).src);
+        });
+        document.body.appendChild(image);
+        image.src = 'smile.gif';
+    });
+
+    // the resize Event --
+    EventUtil.addHandler(window, 'resize', function (event) {
+        console.log('resized');
+    });
+
+    // scroll event
+    EventUtil.addHandler(window, 'scroll', function (event) {
+        if (document.compatMode == 'CSS1Compat') {
+            console.log(document.documentElement.scrollTop);
+        } else {
+            console.log(document.body.scrollTop);
+        }
+    });
+
+    // focus event --  blur, focus
+
+    /*
+    * when focus is moved from one element to another on the page, the following order of event
+    * focusout -- focusin -- blur -- DOMFocusOUt -- focus -- DOMFocusIn
+    * */
+
+    /*
+    * mouse and wheel event --
+    * click, dbclick, mousedown, mouseenter, mouseleave, mouseover, mouseout, mouseup
+    *
+    * and it will under the order of
+    * mousedown, mouseup, click, mousedown, mouseup, click, dbclick
+    * */
+
+    /*
+    * client coordinate --
+    * clientX and clientY in the viewport
+    * */
+
+    var div = document.getElementById('myDiv');
+    EventUtil.addHandler(div, 'click', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log('click coordinates: ' + event.clientX + ',' + event.clientY);
+    });
+
+    // the values for pageX and pageY are the same as ClientX and ClientY when the page is not scrolled.
+
+    // if include the IE 8
+    var div = document.getElementById('myDiv');
+    EventUtil.addHandler(div, 'click', function (event) {
+        event = EventUtil.getEvent(event);
+
+        var pageX = event.pageX;
+        var pageY = event.pageY;
+
+        if (pageX === undefined) {
+            pageX = event.clientX + (document.body.scrollLeft || document.documentElement.scrollLeft);
+        }
+
+        if (pageY == undefined) {
+            pageY = event.clientY + (document.body.scrollTop || document.documentElement.scrollTop);
+        }
+
+        console.log('Page coordinate: ' + pageX + "," + pageY);
+    });
+
+
+    // if location to the entire screen
+    var div = document.getElementById('myDiv');
+    EventUtil.addHandler(div, 'click', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log('screen coordinates: ' + event.screenX + ',' + event.screenY);
+    });
+
+
+    /*
+    * modifier keys --
+    *
+    * shift, ctrl, alt, meta
+    * */
+
+    var div = document.getElementById('myDiv');
+    EventUtil.addHandler(div, 'click', function (event) {
+        event = EventUtil.getEvent(event);
+
+        var keys = new Array();
+
+        if (event.shiftKey) {
+            keys.push('shift');
+        }
+        if (event.ctrlKey) {
+            keys.push('ctrl');
+        }
+        if (event.altKey) {
+            keys.push('alt');
+        }
+        if (event.metaKey) {
+            keys.push('meta');
+        }
+        console.log('Keys: ' + keys.join('|'));
+    });
+
+
+    /*
+    *  related elements ---
+    * */
+
+    var EventUtil = {
+        // more code here
+
+        getRelatedTarget: function (event) {
+
+            if (event.relatedTarget) {
+                return event.relatedTarget;
+            } else if (event.toElement) {
+                return event.toElement;
+            } else if (event.fromElement) {
+                return event.fromElement;
+            } else {
+                return null;
+            }
+        }
+
+        // more code here
+    };
+
+    var div = document.getElementById('myDiv');
+    EventUtil.addHandler(div, 'mouseout', function (event) {
+        event = EventUtil.getEvent(event);
+        var target = EventUtil.getTarget(event);
+        var relatedTarget = EventUtil.getRelatedTarget(event);
+        console.log('mouse out of ' + target.tagName + ' to ' + relatedTarget.tagName);
+    });
+
+
+    /*
+    * button ---
+    * o indicates no button
+    * 1 indicates the primary mouse button
+    * 2 indicates the secondary mouse button
+    * 3 indicates the primary and secondary mouse button
+    * 4 indicates the middle mouse buttton
+    * 5 indicates the primary and middle button
+    * 6 indicates the secondary and middle button
+    * 7 indicates all three buttons
+    * */
+
+    var EventUtil = {
+        // more code here
+
+        getButton: function (event) {
+            if (document.implementation.hasFeature('MouseEvents', '2.0')) {
+                return event.button;
+            } else {
+                switch (event.button) {
+                    case 0:
+                    case 1:
+                    case 3:
+                    case 5:
+                    case 7:
+                        return 0;
+                    case 2:
+                    case 6:
+                        return 2;
+                    case 4:
+                        return 1;
+                }
+            }
+        }
+
+        // more code here
+    };
+
+    var div = document.getElementById('myDiv');
+    EventUtil.addHandler(div, 'mousedown', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log(EventUtil.getButton(event));
+    });
+
+    // mousewheel event
+    EventUtil.addHandler(document, 'mousewheel', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log(event.wheelDelta);
+    });
+
+    // for cross-browser solution ---
+    var EventUtil = {
+        // more code here
+
+        getWheelDelta : function (event) {
+            if (eventj.wheelDelta) {
+                return (client.engine.opera && client.engine.opera < 9.5 ?
+                        -event.wheelDelta : event.wheelDelta);
+            } else {
+                return -event.detail * 40;
+            }
+        }
+
+        // more code here
+    };
+
+    // with this method, we can get the IIFE
+    (function () {
+        function handleMouseWheel(event) {
+            event = EventUtil.getEvent(event);
+            var delta = EventUtil.getWheelDelta(event);
+            console.log(delta);
+        }
+
+        EventUtil.addHandler(document, 'mousewheel', handleMouseWheel);
+        EventUtil.addHandler(document, 'DOMMouseScroll', handleMouseWheel);
+    })();
+
+    /*
+    * keyboard and text events ---
+    * */
+
+    // key codes ---
+    var textbox = document.getElementById('myText');
+    EventUtil.addHandler(textbox, 'keyup', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log(event.keyCode);
+    });
+
+    // character events --
+    var EventUtil = {
+        // more code here
+
+        getCharCode: function (event) {
+            if (typeof event.charCode == 'number') {
+                return event.charCode;
+            } else {
+                return event.keyCode;
+            }
+        }
+
+        // more code here..
+    };
+
+    var textBox = document.getElementById('myText');
+    EventUtil.addHandler(textBox, 'keypress', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log(EventUtil.getCharCode(event));
+    });
+
+
+    // DOM 3 changed
+    EventUtil.addHandler(textBox, 'keypress', function (event) {
+        event = EventUtil.getEvent(event);
+        var identifier = event.key || event.keyIdentifier;
+        if (identifier) {
+            console.log(identifier);
+        }
+    });
+
+
+    // textInput event --
+    EventUtil.addHandler(textBox, 'textInput', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log(event.data);
+    });
+
+
+    /*
+    * composition events -- IMEs allow users to input characters not found on the physical keyboards
+    * */
+
+    EventUtil.addHandler(textbox, 'compositionstart', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log(event.data);
+    });
+
+    EventUtil.addHandler(textbox, 'compositiondate', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log(event.data);
+    });
+    EventUtil.addHandler(textbox, 'compositionend', function (event) {
+        event = EventUtil.getEvent(event);
+        console.log(event.data);
+    });
+
+    /*
+    *
+    * HTML5 event ---
+    * */
+
+
 
 </script>
 </body>
