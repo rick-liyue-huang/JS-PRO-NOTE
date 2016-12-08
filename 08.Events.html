@@ -695,8 +695,146 @@
     * */
 
     EventUtil.addHandler(window, 'load', function (event) {
-        
-    })
+        var div = document.getElementById('myDiv');
+        div.innerHTML = 'current orientation is ' + window.orientation;
+
+        EventUtil.addHandler(window, 'orientationchange', function (event) {
+            div.innerHTML = 'current orientation is ' + window.orientation;
+        });
+    });
+
+
+    /*
+    * the divicemotion event --
+    *
+    *  event contains the following additional properties:
+    *  acceleration, accelerationIncludingGravity, interval, rotationRate
+    * */
+
+    EventUtil.addHandler(window, 'devicemotion', function (event) {
+        var output = document.getElementById('output');
+        if (event.rotationRate !== null) {
+            output.innerHTML = 'Alpha=' +event.rotationRate.alpha + " Beta=" +
+                    event.rotationRate.beta +
+                    " Gamma=" + event.rotationRate.gamma;
+        }
+    });
+
+
+    /*
+    * touch and gesture events ---
+    *
+    * touch event- touchstart, touchmove, touchend, touchcancel, touches, targetTouches, changedTouches
+    *
+    * clientX, clientY, pageX, screenX, target
+    * */
+
+    function handleTouchEvent(event) {
+        // only for one touch
+
+        if (event.touches.length == 1) {
+
+            var ouput = document.getElementById('output');
+            switch (event.type) {
+                case 'touchstart':
+                    output.innerHTML = 'touch started (' + event.touches[0].clientX +
+                            ',' + event.touches[0].clientY + ')';
+                    break;
+
+                case 'touchend':
+                    output.innerHTML += '<br>touch ended (' +
+                            event.changedTouches[0].clientX + ',' +
+                            event.changedTouches[0].clientY + ')';
+                    break;
+
+                case 'touchmove':
+                    output.innerHTML += '<br>touch moved (' +
+                            event.changedTouches[0].clientX + ',' +
+                            event.changedTouches[0].clientY + ')';
+                    break;
+            }
+        }
+    }
+
+    EventUtil.addHandler(document, 'touchstart', handleTouchEvent);
+    EventUtil.addHandler(document, 'touchend', handleTouchEvent);
+    EventUtil.addHandler(document, 'touchmove', handleTouchEvent);
+
+    /*
+    * these events fire on all elements of the document, so you can manipulate different parts of the page, the order of events
+    * touchstart -- mouseover -- mousemove -- mousedown -- mouseup -- click -- touchend
+    * */
+
+
+    /*
+    *
+    * gesture events ---
+    * gesturestart , gesturechange, gestureend
+    * */
+
+    function handleGestureEvent(event) {
+        var output = document.getElementById('output');
+
+        switch (event.type) {
+            case 'gestruestart':
+                output.innerHTML = 'gesture started (rotation=' + event.rotation +
+                        ',scale=' + event.scale + ')';
+                break;
+
+            case 'gestureend':
+                output.innerHTML += '<br>gesture ended (rotation=' + event.rotation +
+                        ',scale=' + event.scale + ')';
+                break;
+
+            case 'gesturechange':
+                output.innerHTML += '<br>gesture changed (rotation=' + event.rotation +
+                        ',scale=' + event.scale + ')';
+                break;
+        }
+    }
+
+    document.addEventListener('gesturestart', handleGestureEvent, false);
+    document.addEventListener('gestureend', handleGestureEvent, false);
+    document.addEventListener('gesturechange', handleGestureEvent, false);
+
+    /*
+    * event delegation --- event delegation takes advantage of event bubbling to assign a single event handler to manage all events of a
+    * particular type.
+    *  ul -
+    *  > li
+    *
+    * */
+
+    var list = document.getElementById('myLinks');
+
+    EventUtil.addHandler(list, 'click', function (event) {
+        event = EventUtil.getEvent(event);
+        var target = EventUtil.getTarget(event);
+
+        switch (target.id) {
+            case 'doSomething':
+                document.title = "i changed the document's title";
+                break;
+            case 'goSomewhere':
+                location.href = 'http://www.google.com';
+                break;
+            case 'sayHi':
+                console.log('hi');
+                break;
+        }
+    });
+
+    /*
+    * Custom Dom events ----
+    * custom events do not get fired natively by the DOM but provided so that developers can create their own events.
+    * */
+
+
+
+
+
+
+
 
 
 
