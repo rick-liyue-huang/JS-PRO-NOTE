@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<!--basic usage -- canvas requires at least its width and height attributes to be set in order to indicate the size of the drawing to be created.-->
+<canvas id="drawing" width="200" height="200">a drawing of something</canvas>
+
+<script>
+
+/*
+* understanding the <canvas> element, drawing simple 2d graphics and 3d drawing with webgl
+*
+* HTML5's most popular addition is the <canvas> element. this element designates an area of the page where graphics can be created.
+*
+* basic usage -- to begin drawing on a canvas, you need to retrieve a drawing context. a reference to a drawing context is retrieved using the getContext() method and passing in the name of
+* the context.
+*
+* */
+
+    var drawing  = document.getElementById('drawing');
+
+    // make sure <canvas> is completely supported
+    if (drawing.getContex) {
+        var context = drawing.getContex('2d');
+
+        // more code here
+    }
+
+    /*
+    * images created on a canvas element can be exported using the toDataURL() method.
+    *
+    * */
+    var drawing = document.getElementById('drawing');
+
+// make sure <canvas> is completely supported
+    if (drawing.getContex) {
+
+        // get data uri of the image
+        var imgURI = drawing.toDataURL('image/png');
+
+        // display the image
+        var image = document.createElement('img');
+        image.src = imgURI;
+        document.body.appendChild(image);
+    }
+
+
+    /*
+    *
+    * the 2D context ---
+    * the 2d drawing context provides methods for drawing simple 2d shapes such as rectangles, arcs, and paths.
+    * */
+
+    var drawing = document.getElementById('drawing');
+
+    // make sure <canvas> is completely supported
+    if (drawing.getContex) {
+        // here firstly set the stroke and fill style in this context
+        var context = drawing.getContex('2d');
+        context.strokeStyle = 'red';
+        context.fillStyle = '#0000ff';
+    }
+
+
+    /*
+    * drawing rectangle --
+    * */
+
+    var drawing = document.getElementById('drawing');
+
+    if (drawing.getContext) {
+        var context = drawing.getContext('2d');
+
+        context.fillStyle = '#ff0000';
+        context.fillRect(10, 10, 50, 50);
+
+        // drawing a blue rectangle that's semi-transparent
+        context.fillStyle = 'rgba(0,0,255,0.5)';
+        context.fillRect(30, 30, 50, 50);
+
+        // draw a green outlined rectangle
+        context.strokeStyle = 'green';
+        context.strokeRect(100, 10, 50, 50);
+
+        context.strokeStyle = '#ffff00';
+        context.strokeRect(130,30,50,50);
+
+        context.clearRect(40,40,10,10);
+        context.clearRect(140,40,10,10);
+    }
+
+
+    /*
+    * drawing path --
+    *
+    * arc(x, y, radius, startAngle, endAngle, counterclockwise),
+    * artTo(x1, y1, x2, y2, radius),
+    * bezierCurveTo(c1x, c1y, c2x, c2y, x, y),
+    * lineTo(x, y)
+    * moveTo(x, y)
+    * quadraticCurvTo(cx, cy, x, y)
+    * rect(x, y, width, height)
+    *
+    * once the path has been created, you have several options, to draw a line back to the origin of the path, you can call closePath().
+    * if the path is already completed and you want to fill it with fillStyle, call fill()
+    * */
+
+    var drawing = document.getElementById('drawing');
+
+    if (drawing.getContext) {
+        var context = drawing.getContext('2d');
+
+        // start the path
+        context.beginPath();
+
+        // draw outer circle
+        context.arc(100, 100, 99, 0, 2 * Math.PI, false);
+
+        // draw inner circle
+        context.arc(100, 100, 94, 0, 2 * Math.PI, false);
+
+        // draw minute hand
+        context.moveTo(100, 100);
+        context.lineTo(100, 15);
+
+        // draw hour hand
+        context.moveTo(100, 100);
+        context.lineTo(35, 100);
+
+        if (context.isPointInPath(100, 100)) {
+            console.log('point 100,100 is in the path');
+        }
+
+        // stroke the path, which makes the image appear
+        context.stroke();
+    }
+
+
+    /*
+    * drawing Text --
+    * the 2d drawing context provides methods to draw text. there are two methods for drawing text, fillText and strokeText.
+    * they both have three properties:
+    * font -- indicates the font style, size, and family in the same manner specified in CSS, such as '10px Arial'
+    * textAlign -- indicate how the text should be aligned. possible values are 'start', 'end', 'left' right and center
+    * textBaseline -- indicates the baseline of the text. possible values are top hanging middle alphabeitc indeographic, bottom
+    *
+    * at last fillText and strokeText
+    * */
+
+    context.font = 'bold 14px Arial';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('12', 100, 20);
+
+    // start-aligned
+    context.textAlign = "start";
+    context.fillText('12', 100, 40);
+
+    // end-aligned
+    context.textAlign = 'end';
+    context.fillText('12', 100, 60);
+
+    /*
+    * text
+    * */
+
+    var fontSize = 100;
+
+    context.font = fontSize + "px Arial";
+
+    while (context.measureText('hello world!').width > 140) {
+        fontSize--;
+        context.font = fontSize + 'px Arial';
+    }
+
+    context.fillText('hello world!', 10, 10);
+    context.fillText('font size is ' + fontSize + 'px', 10, 50);
+
+
+    /*
+    * transformations --
+    * context transformations allow the manipulation of images drawn onto the canvas.
+    * rotate(angle), scale(scaleX, scaleY), translate(x, y), transform(m1_1, m1_2, m2_1, m2_2, dx, dy), setTransform(m1_1, m1_2, m2_1, m2_2, dx, dy) -- reset the transformation matrix
+    * to its default state and then call transform
+    * */
+
+    var drawing = document.getElementById('drawing');
+
+    if (drawing.getContext) {
+        var context = drawing.getContext('2d');
+
+        context.beginPath();
+
+        // draw outer circle
+        context.arc(100, 100, 99, 0, 2 * Math.PI, false);
+
+        // draw inner circle
+        context.arc(100, 100, 94, 0, 2 * Math.PI, false);
+
+        // translate to center
+        context.translate(100, 100);
+
+        // rotate the hands
+        // since the origin has already been translated to the center of clock, the rotation is applied from that point.
+        // this means that the hands are anchored at the center and then rotated around to the right.
+        context.rotate(1);
+
+        // draw minute hand
+        context.moveTo(0, 0);
+        context.lineTo(0, -85);
+
+        // draw hour hand
+        context.moveTo(0, 0);
+        context.lineTo(-65, 0);
+
+        // stroke the path
+        context.stroke();
+    }
+
+
+    /*
+    * about save() and restore()
+    *
+    * whenever you want to be abale to return to a specific set of properties and transformations, call the save() method, once called, this method pushes all of the settings at the moment
+    * onto a stack for safekeeping, you can go back to the previous setting, call the restore() method, which pops the settings stack and restores all of the setting.
+    * */
+
+    context.fillStyle = '#ff0000';
+    context.save();
+
+    context.fillStyle = '#00ff00';
+    context.translate(100, 100);
+    context.save();
+
+    context.fillStyle = '#0000ff';
+    context.fillRect(0, 0, 100, 200); // draws blue rectangle at (100, 100)
+
+    context.restore();
+    context.fillRect(10, 10, 100, 200); // draws green rectangle at (110, 110);
+
+    context.restore();
+    context.fillRect(0, 0, 100, 200); // draws blue rectangle at (100, 100);
+
+
+    /*
+    * drawing images --
+    * has three formats:
+    *
+    * drawImage(image, destination-x, destination-y),
+    * drawImage(image, destination-x, destination-y, destination width, destination height);
+    * drawImage(image, source x, source y, source width, source height, destination-x, destination-y, destination width, destination height)
+    * */
+//    var image = document.images[0];
+//    context.drawImage(image, 10, 10);
+//
+//    context.drawImage(image, 0, 10, 100, 100, 100, 200, 34,56);
+
+    /*
+    * shadows --
+    * the 2d context will automatically draw a shadow along with a shape or path based on the value of several properties:
+    * shadowColor , shadowOffsetX, shadowOffsetY, shadowBlue
+    * */
+
+    // setup shadow
+    context.shadowOffsetX = 5;
+    context.shadowOffsetY = 5;
+    context.shadowBlur = 4;
+    context.shadowColor = 'rgba(0, 0, 0, 0.5)';
+
+    // draw a red rectangle
+    context.fillStyle = "#ff000";
+    context.fillRect(10, 10, 50, 50);
+
+    context.fillStyle = "rgba(0, 0, 255, 1)";
+    context.fillRect(30, 30, 50, 50);
+
+
+    // gradients --
+    var gradient = context.createLinearGradient(30, 30, 70, 70);
+
+    gradient.addColorStop(0, 'white');
+    gradient.addColorStop(1, 'black');
+
+    // draw a red rectangle
+    context.fillStyle = '#ff0000';
+    context.fillRect(10, 10, 50, 50);
+
+    // draw a gradient rectangle
+    context.fillStyle = gradient;
+    context.fillRect(30, 30, 50, 50);
+
+    // a custom function
+    function createRectLinearGradient(context, x, y, width, height) {
+        return context.createLinearGradient(x, y, x+width, y+height);
+    }
+
+    /*
+    * pattern --
+    * are simply repeating images that may be useful to fill or stroke a shape.
+    * */
+    var image = document.images[0],
+            pattern = context.createPattern(image, 'repeat');
+
+    // draw a rectangle
+    context.fillStyle = pattern;
+    context.fillRect(10, 10, 150, 150);
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

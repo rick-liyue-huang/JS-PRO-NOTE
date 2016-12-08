@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+
+    /*
+    * understanding form basics,
+    * text box validation and interaction
+    * working with other form controls
+    *
+    * one of the original uses of JS was to offload some form-processing responsibilities onto the browser instead of relying on the server to do it all.
+    *
+    * web forms are represented by the <form> element in HTML and by the HTMLFormElement type in JS. HTMLFormElement inherite from HTMLElement. and also has more properties and methods;
+    * acceptCharset - the character sets that the server can process, equivalent to the HTML accept-character attribut.
+    * action - the url to send the request to, equivalent to the HTML action attribute.
+    * enctype - the encoding type of the request,
+    * length - the number of controls in the form
+    * method - the type of HTTP request to send, typically get or post
+    * name - the name of the form
+    * reset() - resets all form fields to their default values
+    * target - the name of the window to use for sending the request and receiving the response
+    * */
+
+    var form = document.getElementById('form1');
+
+    // all forms on the page can also be retrieved from document.forms collection
+    var firstForm = document.forms[0];
+    var myForm = document.forms['form2'];
+
+    /*
+    * submitting forms ---
+    * forms are submitted when a user interacts with a submit or an image button
+    *
+    * generic submit button
+    * <input type="submit" value="submit form">
+    *
+    * custom submit button
+      <button type="submit">submit form</button>
+
+      image button
+      <input type="image" src="graphic.gif">
+
+      if any one of these types of buttons is within a form that has a submit button, pressing enter on the keyborad while a form control has focus will also submit the form
+
+      when a form is submitted in this manner, the submit event fires right before the request is sent to the server.
+
+      preventing the event's default behavior cancels the form submitting.
+    * */
+
+    var form = document.getElementById('myForm');
+    EventUtil.addHandler(form, 'submit', function (event) {
+
+        // get event object
+        event = EventUtil.getEvent(event);
+
+        // prevent form submission
+        EventUtil.preventDefault(event);
+    });
+    // the preventDefault() method stops the form from being submitted.
+    // typically, this functionality is used when data in the form is invalid and should not be sent to the server.
+
+    // if submit the form, also can
+    var form = document.getElementById('myForm');
+    form.submit();
+
+    // avoid to submit forms one more time, we can : disable the submit button once the form is submitted, or use the onsubmit event handler to cancel any further form submission
+
+    /*
+    * reseting forms --
+    * forms are reset when the user click a reset button. they are created by input or button
+    *
+    * <input type="reset" value="reset form">
+    *     or
+*     <button type="reset">reset form</button>
+    * */
+
+    /*
+    * also use preventDefault to cance the reset button
+    * */
+    var form = document.getElementById('myForm');
+    EventUtil.addHandler(form, 'reset', function (event) {
+        event = EventUtil.getEvent(event);
+        EventUtil.preventDefault(event);
+    });
+
+    // also can do that
+    form.reset();
+
+
+    /*
+    * form fields ---
+    * form elements can be accessed in the same ways as any other elements on the page using native DOM methods.
+    * additionaly, all form elements are parts of an elements collection that is a property of each form
+    * */
+
+    var form = document.getElementById('form1');
+
+    // get the first field in the form
+    var field1 = form.elements[0];
+
+    // get the field named 'textbox1'
+    var field2 = form.elements['textbox1'];
+
+    // get the number of fields
+    var fieldCount = form.elements.length;
+
+    /*
+     <form method=”post” id=”myForm”> <ul>
+     <li><input type=”radio” name=”color” value=”red”>Red</li>
+     <li><input type=”radio” name=”color” value=”green”>Green</li>
+     <li><input type=”radio” name=”color” value=”blue”>Blue</li>
+     </ul> </form>
+    * */
+
+    var form = document.getElementById('myForm');
+    var colorFields = form.elements['color'];
+    console.log(colorFields.length); // 3
+    var firstColorField = colorFields[0];
+    var firstField = form.elements[0];
+    console.log(firstColorField === firstField); // true
+
+
+
+    /*
+    * Common form-field property ---
+    * */
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
