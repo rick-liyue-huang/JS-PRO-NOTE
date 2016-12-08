@@ -637,7 +637,66 @@
     * HTML5 event ---
     * */
 
-    E
+    // contextmenu Event
+    // a div is created that has a custom context menu, the ul element serves as the custom context menu and is
+    // initially hidden
+    EventUtil.addHandler(window, 'load', function (event) {
+        var div = document.getElementById('myDiv');
+
+        EventUtil.addHandler(div, 'contextmenu', function (event) {
+            event = EventUtil.getEvent(event);
+            EventUtil.preventDefault(event);
+
+            var menu = document.getElementById('myMenu');
+            menu.style.left = event.clientX + 'px';
+            menu.style.top = event.clientY + 'px';
+            menu.style.visibility = 'visible';
+        });
+
+        EventUtil.addHandler(document, 'click', function (event) {
+            document.getElementById('myMenu').style.visibility = 'hidden';
+        });
+    });
+
+
+    // beforeunload event --
+    EventUtil.addHandler(window, 'beforeunload', function (event) {
+        event = EventUtil.getEvent(event);
+        var message = 'im really going to miss you if you go';
+        event.returnValue = message;
+        return message;
+    });
+
+
+    // DOMContentLoaded event --
+    EventUtil.addHandler(document, 'DOMContentLoaded', function (event) {
+        console.log('content loaded');
+    });
+
+
+    /*
+    * the readystatechange event -- has five properties : uninitialized, loading, loaded, interactive, complete
+    * */
+    EventUtil.addHandler(document, 'readystatechange', function (event) {
+        if (document.readyState == 'interactive') {
+            console.log('content loaded');
+        }
+    });
+
+    EventUtil.addHandler(document, 'readystatechange', function (event) {
+        if (document.readyState == 'interactive' || document.readyState == 'complete') {
+            EventUtil.removeHandler(document, 'readystatechange', arguments.callee);
+        }
+    });
+
+
+    /*
+    * orientationchange event --
+    * */
+
+    EventUtil.addHandler(window, 'load', function (event) {
+        
+    })
 
 
 
